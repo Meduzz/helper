@@ -1,0 +1,157 @@
+package client
+
+import (
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strconv"
+	"testing"
+
+	"github.com/gin-gonic/gin"
+)
+
+type TestDTO struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+func TestMain(m *testing.M) {
+	server := gin.Default()
+
+	server.GET("/hello/:name/:age", func(ctx *gin.Context) {
+		name := ctx.Param("name")
+		age := ctx.Param("age")
+
+		iAge, err := strconv.Atoi(age)
+
+		if err != nil {
+			ctx.AbortWithError(500, err)
+		}
+
+		ctx.JSON(200, gin.H{"name": name, "age": iAge})
+	})
+	server.POST("/post/echo", func(ctx *gin.Context) {
+		bs, err := ioutil.ReadAll(ctx.Request.Body)
+
+		if err != nil {
+			ctx.AbortWithError(500, err)
+		}
+
+		ctx.Data(200, "application/json", bs)
+	})
+	server.PUT("/post/echo", func(ctx *gin.Context) {
+		bs, err := ioutil.ReadAll(ctx.Request.Body)
+
+		if err != nil {
+			ctx.AbortWithError(500, err)
+		}
+
+		ctx.Data(200, "application/json", bs)
+	})
+
+	go server.Run(":6007")
+
+	os.Exit(m.Run())
+}
+func TestGet(t *testing.T) {
+	req, err := GET("http://localhost:6007/hello/bosse/19")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	res, err := req.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 200 {
+		t.Fail()
+	}
+
+	test := &TestDTO{}
+	err = res.Body(test)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if test.Name != "bosse" {
+		t.Fail()
+	}
+
+	if test.Age != 19 {
+		t.Fail()
+	}
+}
+
+func TestPost(t *testing.T) {
+	body := &TestDTO{"Sven", 64}
+	req, err := POST("http://localhost:6007/post/echo", body)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	res, err := req.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 200 {
+		t.Fail()
+	}
+
+	subject := &TestDTO{}
+
+	err = res.Body(subject)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if subject.Name != body.Name {
+		t.Fail()
+	}
+
+	if subject.Age != body.Age {
+		t.Fail()
+	}
+}
+
+func TestPut(t *testing.T) {
+	body := &TestDTO{"Sven", 64}
+	req, err := PUT("http://localhost:6007/post/echo", body)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	res, err := req.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 200 {
+		t.Fail()
+	}
+
+	subject := &TestDTO{}
+
+	err = res.Body(subject)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if subject.Name != body.Name {
+		t.Fail()
+	}
+
+	if subject.Age != body.Age {
+		t.Fail()
+	}
+}
