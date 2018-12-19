@@ -112,3 +112,7 @@ func (res *HttpResponse) Body(target interface{}) error {
 
 	return json.Unmarshal(bs, target)
 }
+
+func (res *HttpResponse) Response() *http.Response {
+	return res.response
+}
