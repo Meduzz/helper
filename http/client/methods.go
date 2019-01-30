@@ -58,8 +58,17 @@ func PUT(url string, body interface{}) (*HttpRequest, error) {
 	return req, nil
 }
 
-func DELETE(url string) (*HttpRequest, error) {
-	return NewRequest("DELETE", url, nil)
+func DELETE(url string, body interface{}) (*HttpRequest, error) {
+	if body != nil {
+		bs, err := json.Marshal(body)
+
+		if err != nil {
+			return nil, err
+		}
+		return NewRequest("DELETE", url, bytes.NewReader(bs))
+	} else {
+		return NewRequest("DELETE", url, nil)
+	}
 }
 
 func HEAD(url string) (*HttpRequest, error) {

@@ -48,6 +48,17 @@ func TestMain(m *testing.M) {
 
 		ctx.Data(200, "application/json", bs)
 	})
+	server.DELETE("/body", func(ctx *gin.Context) {
+		bs, _ := ctx.GetRawData()
+
+		if len(bs) == 0 {
+			ctx.Status(200)
+			return
+		} else {
+			ctx.Status(201)
+			return
+		}
+	})
 
 	go server.Run(":6007")
 
@@ -152,6 +163,40 @@ func TestPut(t *testing.T) {
 	}
 
 	if subject.Age != body.Age {
+		t.Fail()
+	}
+}
+
+func TestDeleteBodyLess(t *testing.T) {
+	req, err := DELETE("http://localhost:6007/body", nil)
+
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := req.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 200 {
+		t.Fail()
+	}
+}
+
+func TestDeleteWithBody(t *testing.T) {
+	req, err := DELETE("http://localhost:6007/body", "hello")
+
+	if err != nil {
+		t.Error(err)
+	}
+	res, err := req.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 201 {
 		t.Fail()
 	}
 }
