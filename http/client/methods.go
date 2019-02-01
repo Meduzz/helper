@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -18,71 +17,27 @@ type (
 	}
 )
 
-func GET(url string) (*HttpRequest, error) {
-	return NewRequest("GET", url, nil)
-}
+const (
+	JSON  = "application/json"
+	TEXT  = "text/plain"
+	HTML  = "text/html"
+	BYTES = "application/octet-stream"
+	EMPTY = ""
+)
 
-func POST(url string, body interface{}) (*HttpRequest, error) {
-	bs, err := json.Marshal(body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := NewRequest("POST", url, bytes.NewReader(bs))
-
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header("Content-Type", "application/json")
-
-	return req, nil
-}
-
-func PUT(url string, body interface{}) (*HttpRequest, error) {
-	bs, err := json.Marshal(body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := NewRequest("PUT", url, bytes.NewReader(bs))
-
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header("Content-Type", "application/json")
-
-	return req, nil
-}
-
-func DELETE(url string, body interface{}) (*HttpRequest, error) {
-	if body != nil {
-		bs, err := json.Marshal(body)
-
-		if err != nil {
-			return nil, err
-		}
-		return NewRequest("DELETE", url, bytes.NewReader(bs))
-	} else {
-		return NewRequest("DELETE", url, nil)
-	}
-}
-
-func HEAD(url string) (*HttpRequest, error) {
-	return NewRequest("HEAD", url, nil)
-}
-
-func NewRequest(method, url string, body io.Reader) (*HttpRequest, error) {
+func NewRequest(method, url string, body io.Reader, contentType string) (*HttpRequest, error) {
 	req, err := http.NewRequest(method, url, body)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &HttpRequest{req}, nil
+	wrap := &HttpRequest{req}
+	if contentType != "" {
+		wrap.Header("Content-Type", contentType)
+	}
+
+	return wrap, nil
 }
 
 func (req *HttpRequest) Header(key, value string) {
