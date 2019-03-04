@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/nats-io/go-nats"
+	nats "github.com/nats-io/go-nats"
 )
 
 func Connect() (*nats.Conn, error) {
@@ -12,12 +12,17 @@ func Connect() (*nats.Conn, error) {
 	natsUser := os.Getenv("NATS_USER")
 	natsToken := os.Getenv("NATS_TOKEN")
 
+	return Connnect(natsUrl, natsUser, natsToken)
+}
+
+func Connnect(natsUrl, natsUser, natsToken string) (*nats.Conn, error) {
 	if natsUrl == "" {
 		log.Println("No NATS_URL, connecting to localhost.")
 		natsUrl = "nats://localhost:4222"
 	}
 	opts := make([]nats.Option, 0)
 	if natsUser != "" {
+		log.Println("NATS_USER set, trying NATS_PASS.")
 		opts = append(opts, nats.UserInfo(natsUser, os.Getenv("NATS_PASS")))
 	} else if natsToken != "" {
 		opts = append(opts, nats.Token(natsToken))
