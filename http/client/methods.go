@@ -10,6 +10,7 @@ import (
 type (
 	HttpRequest struct {
 		request *http.Request
+		body    io.Reader
 	}
 
 	HttpResponse struct {
@@ -32,7 +33,7 @@ func NewRequest(method, url string, body io.Reader, contentType string) (*HttpRe
 		return nil, err
 	}
 
-	wrap := &HttpRequest{req}
+	wrap := &HttpRequest{req, body}
 	if contentType != "" {
 		wrap.Header("Content-Type", contentType)
 	}
@@ -56,6 +57,10 @@ func (req *HttpRequest) Do(client *http.Client) (*HttpResponse, error) {
 
 func (req *HttpRequest) Request() *http.Request {
 	return req.request
+}
+
+func (req *HttpRequest) Sign(signer func(req *HttpRequest) error) error {
+	return signer(req)
 }
 
 func (res *HttpResponse) Code() int {

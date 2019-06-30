@@ -1,12 +1,15 @@
 package client
 
 import (
+	"crypto/sha256"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"testing"
 
+	"github.com/Meduzz/helper/hmac"
 	"github.com/gin-gonic/gin"
 )
 
@@ -37,9 +40,22 @@ func TestMain(m *testing.M) {
 			ctx.AbortWithError(500, err)
 		}
 
+		sign := ctx.GetHeader("x-sign")
+
+		if sign != "" {
+			log.Println("The request was signed.")
+			if !hmac.Verify([]byte("key"), bs, []byte(sign), sha256.New) {
+				log.Println("The signature was not valid.")
+				ctx.Status(403)
+				return
+			}
+
+			log.Println("The signature was valid.")
+		}
+
 		ctx.Data(200, "application/json", bs)
 	})
-	server.PUT("/post/echo", func(ctx *gin.Context) {
+	server.PUT("/put/echo", func(ctx *gin.Context) {
 		bs, err := ioutil.ReadAll(ctx.Request.Body)
 
 		if err != nil {
@@ -105,6 +121,22 @@ func TestPost(t *testing.T) {
 		t.Error(err)
 	}
 
+	req.Sign(func(req *HttpRequest) error {
+		bs, err := ioutil.ReadAll(req.body)
+
+		if err != nil {
+			return err
+		}
+
+		log.Printf("The body was: %s\n", string(bs))
+
+		val := hmac.Sign([]byte("key"), bs, sha256.New)
+
+		req.Header("x-sign", string(val))
+
+		return nil
+	})
+
 	res, err := req.Do(http.DefaultClient)
 
 	if err != nil {
@@ -134,7 +166,7 @@ func TestPost(t *testing.T) {
 
 func TestPut(t *testing.T) {
 	body := &TestDTO{"Sven", 64}
-	req, err := PUT("http://localhost:6007/post/echo", body)
+	req, err := PUT("http://localhost:6007/put/echo", body)
 
 	if err != nil {
 		t.Error(err)
