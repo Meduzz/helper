@@ -63,6 +63,10 @@ func (req *HttpRequest) Sign(signer func(req *HttpRequest) error) error {
 	return signer(req)
 }
 
+func (req *HttpRequest) Body() io.Reader {
+	return req.body
+}
+
 func (res *HttpResponse) Code() int {
 	return res.response.StatusCode
 }

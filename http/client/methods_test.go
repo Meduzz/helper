@@ -122,7 +122,7 @@ func TestPost(t *testing.T) {
 	}
 
 	req.Sign(func(req *HttpRequest) error {
-		bs, err := ioutil.ReadAll(req.body)
+		bs, err := ioutil.ReadAll(req.Body())
 
 		if err != nil {
 			return err
