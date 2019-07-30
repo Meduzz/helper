@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"encoding/json"
 )
 
@@ -16,7 +15,7 @@ func POST(url string, body interface{}) (*HttpRequest, error) {
 		return nil, err
 	}
 
-	return NewRequest("POST", url, bytes.NewReader(bs), JSON)
+	return NewRequest("POST", url, bs, JSON)
 }
 
 func PUT(url string, body interface{}) (*HttpRequest, error) {
@@ -26,7 +25,7 @@ func PUT(url string, body interface{}) (*HttpRequest, error) {
 		return nil, err
 	}
 
-	return NewRequest("PUT", url, bytes.NewReader(bs), JSON)
+	return NewRequest("PUT", url, bs, JSON)
 }
 
 func DELETE(url string, body interface{}) (*HttpRequest, error) {
@@ -36,7 +35,7 @@ func DELETE(url string, body interface{}) (*HttpRequest, error) {
 		if err != nil {
 			return nil, err
 		}
-		return NewRequest("DELETE", url, bytes.NewReader(bs), JSON)
+		return NewRequest("DELETE", url, bs, JSON)
 	} else {
 		return NewRequest("DELETE", url, nil, EMPTY)
 	}

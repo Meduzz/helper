@@ -122,15 +122,7 @@ func TestPost(t *testing.T) {
 	}
 
 	req.Sign(func(req *HttpRequest) error {
-		bs, err := ioutil.ReadAll(req.Body())
-
-		if err != nil {
-			return err
-		}
-
-		log.Printf("The body was: %s\n", string(bs))
-
-		val := hmac.Sign([]byte("key"), bs, sha256.New)
+		val := hmac.Sign([]byte("key"), req.Body(), sha256.New)
 
 		req.Header("x-sign", string(val))
 

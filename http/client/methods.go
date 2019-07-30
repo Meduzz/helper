@@ -1,8 +1,8 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -10,7 +10,7 @@ import (
 type (
 	HttpRequest struct {
 		request *http.Request
-		body    io.Reader
+		body    []byte
 	}
 
 	HttpResponse struct {
@@ -26,8 +26,8 @@ const (
 	EMPTY = ""
 )
 
-func NewRequest(method, url string, body io.Reader, contentType string) (*HttpRequest, error) {
-	req, err := http.NewRequest(method, url, body)
+func NewRequest(method, url string, body []byte, contentType string) (*HttpRequest, error) {
+	req, err := http.NewRequest(method, url, bytes.NewReader(body))
 
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (req *HttpRequest) Sign(signer func(req *HttpRequest) error) error {
 	return signer(req)
 }
 
-func (req *HttpRequest) Body() io.Reader {
+func (req *HttpRequest) Body() []byte {
 	return req.body
 }
 
