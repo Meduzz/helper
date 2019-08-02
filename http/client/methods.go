@@ -86,6 +86,33 @@ func (res *HttpResponse) Body(target interface{}) error {
 	return json.Unmarshal(bs, target)
 }
 
+func (res *HttpResponse) AsJson(target interface{}) error {
+	defer res.response.Body.Close()
+	bs, err := ioutil.ReadAll(res.response.Body)
+
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal(bs, target)
+}
+
+func (res *HttpResponse) AsText() (string, error) {
+	defer res.response.Body.Close()
+	bs, err := ioutil.ReadAll(res.response.Body)
+
+	if err != nil {
+		return "", err
+	}
+
+	return string(bs), nil
+}
+
+func (res *HttpResponse) AsBytes() ([]byte, error) {
+	defer res.response.Body.Close()
+	return ioutil.ReadAll(res.response.Body)
+}
+
 func (res *HttpResponse) Response() *http.Response {
 	return res.response
 }

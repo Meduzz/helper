@@ -62,7 +62,9 @@ func TestMain(m *testing.M) {
 			ctx.AbortWithError(500, err)
 		}
 
-		ctx.Data(200, "application/json", bs)
+		contentType := ctx.GetHeader("Content-Type")
+
+		ctx.Data(200, contentType, bs)
 	})
 	server.DELETE("/body", func(ctx *gin.Context) {
 		bs, _ := ctx.GetRawData()
@@ -98,7 +100,7 @@ func TestGet(t *testing.T) {
 	}
 
 	test := &TestDTO{}
-	err = res.Body(test)
+	err = res.AsJson(test)
 
 	if err != nil {
 		t.Error(err)
@@ -141,7 +143,7 @@ func TestPost(t *testing.T) {
 
 	subject := &TestDTO{}
 
-	err = res.Body(subject)
+	err = res.AsJson(subject)
 
 	if err != nil {
 		t.Error(err)
@@ -157,8 +159,7 @@ func TestPost(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	body := &TestDTO{"Sven", 64}
-	req, err := PUT("http://localhost:6007/put/echo", body)
+	req, err := PUTText("http://localhost:6007/put/echo", "Hello there!", "text/plain")
 
 	if err != nil {
 		t.Error(err)
@@ -174,19 +175,17 @@ func TestPut(t *testing.T) {
 		t.Fail()
 	}
 
-	subject := &TestDTO{}
-
-	err = res.Body(subject)
+	text, err := res.AsText()
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if subject.Name != body.Name {
+	if text != "Hello there!" {
 		t.Fail()
 	}
 
-	if subject.Age != body.Age {
+	if res.Header("Content-Type") != "text/plain" {
 		t.Fail()
 	}
 }
