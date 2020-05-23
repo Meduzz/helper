@@ -1,24 +1,17 @@
 package metadata
 
-import "fmt"
-
-const (
-	IDServer = "https://id.chimps.se"
-)
-
 type (
 	Metadata struct {
-		IDRef          string    `json:"idref"`
-		Domain         string    `json:"domain,omitempty"`
-		Context        string    `json:"context,omitempty"`
-		SubscribeURL   string    `json:"subscribe,omitempty"`
-		UnsubscribeURL string    `json:"unsubscribe,omitempty"`
-		Policies       []*Policy `json:"policies"`
-		Roles          []*Role   `json:"roles"`
+		Domain   string    `json:"domain,omitempty"`
+		Context  string    `json:"context,omitempty"`
+		Policies []*Policy `json:"policies"`
+		Roles    []*Role   `json:"roles"`
+		CbURL    string    `json:"callback,omitempty"`
 	}
 
 	Role struct {
 		Name       string   `json:"name"`
+		System     bool     `json:"system,omitempty"`
 		PolicyRefs []string `json:"policies"`
 	}
 
@@ -32,10 +25,6 @@ type (
 		URL    string `json:"url"`
 	}
 )
-
-func IDRef(id string) string {
-	return fmt.Sprintf("%s/id/%s", IDServer, id)
-}
 
 func NewPath(method, url string) *Path {
 	return &Path{method, url}
@@ -73,18 +62,16 @@ func Roles(roles ...*Role) []*Role {
 	return roles
 }
 
-func NewRole(name string, roleRefs ...string) *Role {
-	return &Role{name, roleRefs}
+func NewRole(name string, system bool, policyRefs ...string) *Role {
+	return &Role{name, system, policyRefs}
 }
 
-func NewMetadata(idref, domain, context, subscribe, unsubscribe string, policies []*Policy, roles []*Role) *Metadata {
+func NewMetadata(domain, context, callbackURL string, policies []*Policy, roles []*Role) *Metadata {
 	return &Metadata{
-		IDRef:          idref,
-		Domain:         domain,
-		Context:        context,
-		SubscribeURL:   subscribe,
-		UnsubscribeURL: unsubscribe,
-		Policies:       policies,
-		Roles:          roles,
+		Domain:   domain,
+		Context:  context,
+		Policies: policies,
+		Roles:    roles,
+		CbURL:    callbackURL,
 	}
 }
