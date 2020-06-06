@@ -11,7 +11,7 @@ type (
 
 	Role struct {
 		Name       string   `json:"name"`
-		System     bool     `json:"system,omitempty"`
+		Private    bool     `json:"private,omitempty"`
 		PolicyRefs []string `json:"policies"`
 	}
 
@@ -62,8 +62,8 @@ func Roles(roles ...*Role) []*Role {
 	return roles
 }
 
-func NewRole(name string, system bool, policyRefs ...string) *Role {
-	return &Role{name, system, policyRefs}
+func NewRole(name string, private bool, policyRefs ...string) *Role {
+	return &Role{name, private, policyRefs}
 }
 
 func NewMetadata(domain, context, callbackURL string, policies []*Policy, roles []*Role) *Metadata {
