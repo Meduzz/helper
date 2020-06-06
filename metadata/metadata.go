@@ -42,7 +42,7 @@ func PUT(url string) *Path {
 	return NewPath("PUT", url)
 }
 
-func DELTETE(url string) *Path {
+func DELETE(url string) *Path {
 	return NewPath("DELETE", url)
 }
 
