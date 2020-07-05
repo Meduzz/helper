@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	nats "github.com/nats-io/go-nats"
+	nats "github.com/nats-io/nats.go"
 )
 
 func Connect() (*nats.Conn, error) {
@@ -18,7 +18,7 @@ func Connect() (*nats.Conn, error) {
 func Connnect(natsUrl, natsUser, natsToken string) (*nats.Conn, error) {
 	if natsUrl == "" {
 		log.Println("No NATS_URL, connecting to localhost.")
-		natsUrl = "nats://localhost:4222"
+		natsUrl = nats.DefaultURL
 	}
 	opts := make([]nats.Option, 0)
 	if natsUser != "" {
