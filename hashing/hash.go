@@ -15,6 +15,14 @@ func Hash(data []byte, hasher hash.Hash) string {
 	return hex.EncodeToString(bs)
 }
 
+func HashWithSalt(data, salt []byte, hasher hash.Hash) string {
+	hasher.Write(data)
+	hasher.Write(salt)
+	bs := hasher.Sum(nil)
+
+	return hex.EncodeToString(bs)
+}
+
 func Token() string {
 	randomBytes, err := Random(1024)
 
