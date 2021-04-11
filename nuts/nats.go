@@ -32,3 +32,23 @@ func Connnect(natsUrl, natsUser, natsToken string) (*nats.Conn, error) {
 
 	return nats.Connect(natsUrl, opts...)
 }
+
+func JsonConnect() (*nats.EncodedConn, error) {
+	conn, err := Connect()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nats.NewEncodedConn(conn, nats.JSON_ENCODER)
+}
+
+func JsonConnnect(natsUrl, natsUser, natsToken string) (*nats.EncodedConn, error) {
+	conn, err := Connnect(natsUrl, natsUser, natsToken)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return nats.NewEncodedConn(conn, nats.JSON_ENCODER)
+}
