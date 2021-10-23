@@ -223,3 +223,40 @@ func TestDeleteWithBody(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestMutatingRequest(t *testing.T) {
+	req, err := GET("/hello/bosse/19")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	req.Request().URL.Scheme = "http"
+	req.Request().URL.Host = "localhost:6007"
+
+	res, err := req.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 200 {
+		t.Fail()
+	}
+
+	test := &TestDTO{}
+	err = res.AsJson(test)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if test.Name != "bosse" {
+		t.Fail()
+	}
+
+	if test.Age != 19 {
+		t.Fail()
+	}
+
+}
