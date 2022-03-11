@@ -56,7 +56,7 @@ func TestMain(m *testing.M) {
 		ctx.Data(200, "application/json", bs)
 	})
 	server.PUT("/put/echo", func(ctx *gin.Context) {
-		bs, err := ioutil.ReadAll(ctx.Request.Body)
+		bs, err := ctx.GetRawData()
 
 		if err != nil {
 			ctx.AbortWithError(500, err)
@@ -259,4 +259,49 @@ func TestMutatingRequest(t *testing.T) {
 		t.Fail()
 	}
 
+}
+
+func TestCopyPostRequest(t *testing.T) {
+	body := &TestDTO{"Sven", 64}
+	req, err := POST("http://localhost:6007/post/echo", body)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	req.Sign(func(req *HttpRequest) error {
+		val := hmac.Sign([]byte("key"), req.Body(), sha256.New)
+
+		req.Header("x-sign", string(val))
+
+		return nil
+	})
+
+	copy := FromRequest(req.Request())
+
+	res, err := copy.Do(http.DefaultClient)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if res.Code() != 200 {
+		t.Fail()
+	}
+
+	subject := &TestDTO{}
+
+	err = res.AsJson(subject)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if subject.Name != body.Name {
+		t.Fail()
+	}
+
+	if subject.Age != body.Age {
+		t.Fail()
+	}
 }
