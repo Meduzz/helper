@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/Meduzz/helper/block"
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/wendy"
 	"github.com/nats-io/nats.go"
@@ -32,7 +33,11 @@ func WendyMethod(module, method string, handler wendy.Handler) *cobra.Command {
 			conn.Subscribe(fmt.Sprintf("%s.%s", module, method), wrapHandler(handler))
 		}
 
-		return nil
+		defer conn.Close()
+
+		return block.Block(func() error {
+			return conn.Drain()
+		})
 	}
 
 	return cmd

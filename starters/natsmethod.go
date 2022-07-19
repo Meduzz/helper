@@ -1,9 +1,7 @@
 package starters
 
 import (
-	"os"
-	"os/signal"
-
+	"github.com/Meduzz/helper/block"
 	"github.com/Meduzz/helper/nuts"
 	"github.com/nats-io/nats.go"
 	"github.com/spf13/cobra"
@@ -31,14 +29,11 @@ func NatsMethod(handler nats.MsgHandler) *cobra.Command {
 			conn.Subscribe(*topic, handler)
 		}
 
-		// block
-		quit := make(chan os.Signal, 1)
-		signal.Notify(quit, os.Interrupt)
-		<-quit
+		defer conn.Close()
 
-		conn.Close()
-
-		return nil
+		return block.Block(func() error {
+			return conn.Drain()
+		})
 	}
 
 	return cmd

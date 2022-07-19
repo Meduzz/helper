@@ -3,6 +3,7 @@ package starters
 import (
 	"fmt"
 
+	"github.com/Meduzz/helper/block"
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/wendy"
 	"github.com/spf13/cobra"
@@ -33,7 +34,11 @@ func WendyModules(modules ...*wendy.Module) *cobra.Command {
 			}
 		}
 
-		return nil
+		defer conn.Close()
+
+		return block.Block(func() error {
+			return conn.Drain()
+		})
 	}
 
 	return cmd
