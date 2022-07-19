@@ -26,11 +26,11 @@ func WendyModules(modules ...*wendy.Module) *cobra.Command {
 
 		if *queue != "" {
 			for _, m := range modules {
-				conn.QueueSubscribe(fmt.Sprintf("%s.#", m.Name()), *queue, wrapModule(m))
+				conn.QueueSubscribe(fmt.Sprintf("%s.*", m.Name()), *queue, wrapModule(m))
 			}
 		} else {
 			for _, m := range modules {
-				conn.Subscribe(fmt.Sprintf("%s.#", m.Name()), wrapModule(m))
+				conn.Subscribe(fmt.Sprintf("%s.*", m.Name()), wrapModule(m))
 			}
 		}
 

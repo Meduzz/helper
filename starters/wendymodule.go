@@ -28,9 +28,9 @@ func WendyModule(module *wendy.Module) *cobra.Command {
 		}
 
 		if *queue != "" {
-			conn.QueueSubscribe(fmt.Sprintf("%s.#", module.Name()), *queue, wrapModule(module))
+			conn.QueueSubscribe(fmt.Sprintf("%s.*", module.Name()), *queue, wrapModule(module))
 		} else {
-			conn.Subscribe(fmt.Sprintf("%s.#", module.Name()), wrapModule(module))
+			conn.Subscribe(fmt.Sprintf("%s.*", module.Name()), wrapModule(module))
 		}
 
 		defer conn.Close()
