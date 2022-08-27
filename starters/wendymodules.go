@@ -1,8 +1,6 @@
 package starters
 
 import (
-	"fmt"
-
 	"github.com/Meduzz/helper/block"
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/wendy"
@@ -24,14 +22,10 @@ func WendyModules(modules ...*wendy.Module) *cobra.Command {
 			return err
 		}
 
-		if *queue != "" {
-			for _, m := range modules {
-				conn.QueueSubscribe(fmt.Sprintf("%s.*", m.Name()), *queue, wrapModule(m))
-			}
-		} else {
-			for _, m := range modules {
-				conn.Subscribe(fmt.Sprintf("%s.*", m.Name()), wrapModule(m))
-			}
+		err = wendy.ServeModules(conn, *queue, modules...)
+
+		if err != nil {
+			return err
 		}
 
 		defer conn.Close()
