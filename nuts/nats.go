@@ -7,25 +7,24 @@ import (
 	nats "github.com/nats-io/nats.go"
 )
 
+// Attempt to connect to nats via data in ENV
 func Connect() (*nats.Conn, error) {
 	natsUrl := os.Getenv("NATS_URL")
 	natsUser := os.Getenv("NATS_USER")
+	natsPass := os.Getenv("NATS_PASS")
 	natsToken := os.Getenv("NATS_TOKEN")
 
-	return Connnect(natsUrl, natsUser, natsToken)
-}
+	opts := make([]nats.Option, 0)
 
-func Connnect(natsUrl, natsUser, natsToken string) (*nats.Conn, error) {
 	if natsUrl == "" {
 		log.Println("No NATS_URL, connecting to localhost.")
 		natsUrl = nats.DefaultURL
 	}
-	opts := make([]nats.Option, 0)
-	if natsUser != "" {
-		log.Println("NATS_USER set, trying NATS_PASS.")
-		opts = append(opts, nats.UserInfo(natsUser, os.Getenv("NATS_PASS")))
-	} else if natsToken != "" {
+
+	if natsToken != "" {
 		opts = append(opts, nats.Token(natsToken))
+	} else if natsUser != "" && natsPass != "" {
+		opts = append(opts, nats.UserInfo(natsUser, natsPass))
 	} else {
 		log.Println("Neither NATS_USER & NATS_PASS or NATS_TOKEN was provided.")
 	}
@@ -35,16 +34,6 @@ func Connnect(natsUrl, natsUser, natsToken string) (*nats.Conn, error) {
 
 func JsonConnect() (*nats.EncodedConn, error) {
 	conn, err := Connect()
-
-	if err != nil {
-		return nil, err
-	}
-
-	return nats.NewEncodedConn(conn, nats.JSON_ENCODER)
-}
-
-func JsonConnnect(natsUrl, natsUser, natsToken string) (*nats.EncodedConn, error) {
-	conn, err := Connnect(natsUrl, natsUser, natsToken)
 
 	if err != nil {
 		return nil, err
