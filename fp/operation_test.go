@@ -20,6 +20,14 @@ func FailFunc() (string, error) {
 	return "", errBoom
 }
 
+func StructFunc(message string) (*Message, error) {
+	if message != "error" {
+		return &Message{message}, nil
+	} else {
+		return nil, fmt.Errorf(message)
+	}
+}
+
 func Test_Then(t *testing.T) {
 	subject := Execute(OkFunc())
 
@@ -37,9 +45,13 @@ func Test_Then(t *testing.T) {
 }
 
 func Test_AdvancedThen(t *testing.T) {
-	subject := Execute(OkFunc())
+	subject := Execute(StructFunc("Hello world"))
 
-	result, err := Then(subject, func(s string) (*Message, error) {
+	subject2 := Then(subject, func(msg *Message) (string, error) {
+		return msg.Text, nil
+	})
+
+	result, err := Then(subject2, func(s string) (*Message, error) {
 		return &Message{s}, nil
 	}).Get()
 
