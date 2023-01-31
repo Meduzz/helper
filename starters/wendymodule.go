@@ -4,6 +4,7 @@ import (
 	"github.com/Meduzz/helper/block"
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/wendy"
+	wendyrpc "github.com/Meduzz/wendy-rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -22,7 +23,7 @@ func WendyModule(module *wendy.Module) *cobra.Command {
 			return err
 		}
 
-		err = wendy.ServeModules(conn, *queue, module)
+		err = wendyrpc.ServeModules(conn, *queue, module)
 
 		if err != nil {
 			return err
