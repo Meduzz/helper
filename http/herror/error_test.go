@@ -30,7 +30,7 @@ func TestCreatingAnError(t *testing.T) {
 }
 
 func TestUnwrapAnError(t *testing.T) {
-	wrapped := fmt.Errorf("Something is clearly missing! %w", ErrNotFound)
+	wrapped := fmt.Errorf("Something is clearly missing! %w", IsError(404))
 
 	if !errors.Is(wrapped, ErrNotFound) {
 		t.Error("wrapped error was not ErrNotFound")
@@ -44,5 +44,13 @@ func TestSomeOtherError(t *testing.T) {
 
 	if code != 500 {
 		t.Error("Code was not 500", code)
+	}
+}
+
+func TestIsNotAnError(t *testing.T) {
+	candidate := IsError(399)
+
+	if candidate != nil {
+		t.Error("candidate was set")
 	}
 }

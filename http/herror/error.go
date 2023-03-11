@@ -44,6 +44,15 @@ func CodeFromError(err error) int {
 	return 500
 }
 
+// IsError will check if a code is over 399 and then create an error for that code or return nil.
+func IsError(code int) error {
+	if code > 399 {
+		return ErrorFromCode(code)
+	}
+
+	return nil
+}
+
 // common error variants
 var (
 	ErrBadRequest         = ErrorFromCode(http.StatusBadRequest)
