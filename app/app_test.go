@@ -32,7 +32,7 @@ func (b *badConfig) Start() error {
 
 func TestHappyCase(t *testing.T) {
 	config := &goodConfig{}
-	err := app.Initiate("config.json", config)
+	err := app.Initiate("test_config.json", config)
 
 	if err != nil {
 		t.Error(err)
@@ -52,7 +52,7 @@ func TestHappyCase(t *testing.T) {
 
 func TestSadCase(t *testing.T) {
 	config := &badConfig{}
-	err := app.Initiate("config.json", config)
+	err := app.Initiate("test_config.json", config)
 
 	if err == nil {
 		t.Error("expected an error")
