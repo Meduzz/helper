@@ -1,0 +1,127 @@
+package slice
+
+// Map on a slice of T returning a slice of K
+func Map[T any, K any](in []T, handler func(T) K) []K {
+	out := make([]K, 0)
+
+	for _, i := range in {
+		out = append(out, handler(i))
+	}
+
+	return out
+}
+
+// FlatMap on a slice of T to a slice of K
+func FlatMap[T any, K any](in []T, handler func(T) []K) []K {
+	out := make([]K, 0)
+
+	for _, i := range in {
+		out = append(out, handler(i)...)
+	}
+
+	return out
+}
+
+// Fold over a slice of T merging into type of K
+func Fold[T any, K any](in []T, agg K, handler func(T, K) K) K {
+	for _, i := range in {
+		agg = handler(i, agg)
+	}
+
+	return agg
+}
+
+// ForEach over a slice of T
+func ForEach[T any](in []T, handler func(T)) {
+	for _, i := range in {
+		handler(i)
+	}
+}
+
+// Concat concats 2 slices of T into one
+func Concat[T any](first []T, second []T) []T {
+	return append(first, second...)
+}
+
+// Head returns first value of slice of T
+func Head[T any](in []T) T {
+	return in[0]
+}
+
+// Tail returns all but first item of slice of T
+func Tail[T any](in []T) []T {
+	return in[1:]
+}
+
+// Take returns count from slice of T
+func Take[T any](in []T, count int) []T {
+	return in[:count]
+}
+
+// Skip returns everything from slice of T after count
+func Skip[T any](in []T, count int) []T {
+	return in[count:]
+}
+
+// Partition splits slice of T into chunks of size
+func Partition[T any](in []T, size int) [][]T {
+	out := make([][]T, 0)
+	step := make([]T, size)
+	count := 0
+
+	ForEach(in, func(t T) {
+		if count == size {
+			out = append(out, step)
+			count = 0
+			step = make([]T, size)
+		}
+
+		step = append(step, t)
+		count++
+	})
+
+	return append(out, step)
+}
+
+// Group a slice of T into a map[string][]T
+func Group[T any](in []T, grouper func(T) string) map[string][]T {
+	out := make(map[string][]T)
+
+	Fold(in, out, func(t T, m map[string][]T) map[string][]T {
+		key := grouper(t)
+		items := m[key]
+
+		if items == nil {
+			items = make([]T, 0)
+		}
+
+		items = append(items, t)
+		m[key] = items
+
+		return m
+	})
+
+	return out
+}
+
+// Shard a slice of T into a map[int64][]T
+func Shard[T any](in []T, sharder func(T) int64) map[int64][]T {
+	out := make(map[int64][]T, 0)
+
+	Fold(in, out, func(t T, m map[int64][]T) map[int64][]T {
+		key := sharder(t)
+		list := m[key]
+
+		if list == nil {
+			list = make([]T, 0)
+		}
+
+		list = append(list, t)
+
+		m[key] = list
+
+		return m
+	})
+
+	return out
+}
