@@ -37,3 +37,13 @@ func TestSharding(t *testing.T) {
 		t.Errorf("len of result was not 2 but %d", len(result))
 	}
 }
+
+func TestFilter(t *testing.T) {
+	result := Filter(subject, func(i int) bool {
+		return i%2 == 0
+	})
+
+	if len(result) != 5 {
+		t.Errorf("result was not 5 but %d", len(result))
+	}
+}

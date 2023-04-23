@@ -45,7 +45,7 @@ func Filter[T any](in []T, handler func(T) bool) []T {
 	type K []T
 	out := make([]T, 0)
 
-	Fold[T, K](in, out, func(t T, k K) K {
+	out = Fold[T, K](in, out, func(t T, k K) K {
 		if handler(t) {
 			return append(k, t)
 		}
