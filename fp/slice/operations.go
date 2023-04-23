@@ -1,5 +1,7 @@
 package slice
 
+import "reflect"
+
 // Map on a slice of T returning a slice of K
 func Map[T any, K any](in []T, handler func(T) K) []K {
 	out := make([]K, 0)
@@ -36,6 +38,22 @@ func ForEach[T any](in []T, handler func(T)) {
 	for _, i := range in {
 		handler(i)
 	}
+}
+
+// Filter over a slice of T returning all matches
+func Filter[T any](in []T, handler func(T) bool) []T {
+	type K []T
+	out := make([]T, 0)
+
+	Fold[T, K](in, out, func(t T, k K) K {
+		if handler(t) {
+			return append(k, t)
+		}
+
+		return k
+	})
+
+	return out
 }
 
 // Concat concats 2 slices of T into one
@@ -124,4 +142,11 @@ func Shard[T any](in []T, sharder func(T) int64) map[int64][]T {
 	})
 
 	return out
+}
+
+// Contains over a slice of T returning true if needle exists in slice
+func Contains[T any](in []T, needle T) bool {
+	return 0 < len(Filter(in, func(t T) bool {
+		return reflect.DeepEqual(t, needle)
+	}))
 }
