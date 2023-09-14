@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func WendyMethod(module, method string, handler wendy.Handler) *cobra.Command {
+func WendyMethod(app, module, method string, handler wendy.Handler) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "start a wendy method",
@@ -23,7 +23,7 @@ func WendyMethod(module, method string, handler wendy.Handler) *cobra.Command {
 			return err
 		}
 
-		err = wendyrpc.ServeMethod(conn, *queue, module, method, handler)
+		err = wendyrpc.ServeMethod(conn, *queue, app, module, method, handler)
 
 		if err != nil {
 			return err
