@@ -63,21 +63,42 @@ func Concat[T any](first []T, second []T) []T {
 
 // Head returns first value of slice of T
 func Head[T any](in []T) T {
+	if len(in) == 0 {
+		var out T
+		return out
+	}
+
 	return in[0]
 }
 
 // Tail returns all but first item of slice of T
 func Tail[T any](in []T) []T {
+	if len(in) == 0 {
+		return make([]T, 0)
+	}
+
 	return in[1:]
 }
 
-// Take returns count from slice of T
+// Take returns count from slice of T or all of T is less than count
 func Take[T any](in []T, count int) []T {
+	if len(in) == 0 {
+		return make([]T, 0)
+	} else if len(in) < count {
+		return in
+	}
+
 	return in[:count]
 }
 
 // Skip returns everything from slice of T after count
 func Skip[T any](in []T, count int) []T {
+	if len(in) == 0 {
+		return make([]T, 0)
+	} else if len(in) < count {
+		return in
+	}
+
 	return in[count:]
 }
 

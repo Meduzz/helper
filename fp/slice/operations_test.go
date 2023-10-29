@@ -1,6 +1,8 @@
 package slice
 
-import "testing"
+import (
+	"testing"
+)
 
 var subject = []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
@@ -45,5 +47,53 @@ func TestFilter(t *testing.T) {
 
 	if len(result) != 5 {
 		t.Errorf("result was not 5 but %d", len(result))
+	}
+}
+
+func TestHeadTailBounds(t *testing.T) {
+	subject := make([]string, 0)
+	partial := make([]string, 0)
+	partial = append(partial, "first")
+
+	headResult := Head(subject)
+
+	if headResult != "" {
+		t.Error("headResult was not empty")
+	}
+
+	tailResult := Tail(subject)
+
+	if len(tailResult) > 0 {
+		t.Error("tailResult was not empty")
+	}
+
+	tailResult = Tail(partial)
+
+	if len(tailResult) > 0 {
+		t.Error("tailResult of partial was not empty")
+	}
+
+	takeResult := Take(subject, 1)
+
+	if len(takeResult) > 0 {
+		t.Error("takeResult was not empty")
+	}
+
+	takeResult = Take(partial, 2)
+
+	if len(takeResult) != 1 {
+		t.Errorf("takeResult of partial was not 1 but %d", len(takeResult))
+	}
+
+	skipResult := Skip(subject, 1)
+
+	if len(skipResult) > 0 {
+		t.Error("skipResult was not empty")
+	}
+
+	skipResult = Skip(partial, 1)
+
+	if len(skipResult) > 0 {
+		t.Error("skipResult of partial was not empty")
 	}
 }
