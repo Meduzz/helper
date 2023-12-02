@@ -1,37 +1,39 @@
-package fp
+package result_test
 
 import (
 	"errors"
 	"fmt"
 	"testing"
+
+	"github.com/Meduzz/helper/fp/result"
 )
 
 var errBoom = errors.New("poff")
 
-type Message struct {
+type message struct {
 	Text string
 }
 
-func OkFunc() (string, error) {
+func okFunc() (string, error) {
 	return "Hello world", nil
 }
 
-func FailFunc() (string, error) {
+func failFunc() (string, error) {
 	return "", errBoom
 }
 
-func StructFunc(message string) (*Message, error) {
-	if message != "error" {
-		return &Message{message}, nil
+func StructFunc(msg string) (*message, error) {
+	if msg != "error" {
+		return &message{msg}, nil
 	} else {
-		return nil, fmt.Errorf(message)
+		return nil, fmt.Errorf(msg)
 	}
 }
 
 func Test_Then(t *testing.T) {
-	subject := Execute(OkFunc())
+	subject := result.Execute(okFunc())
 
-	result, err := Then(subject, func(s string) (string, error) {
+	result, err := result.Then(subject, func(s string) (string, error) {
 		return fmt.Sprintf("%s!", s), nil
 	}).Get()
 
@@ -45,14 +47,14 @@ func Test_Then(t *testing.T) {
 }
 
 func Test_AdvancedThen(t *testing.T) {
-	subject := Execute(StructFunc("Hello world"))
+	subject := result.Execute(StructFunc("Hello world"))
 
-	subject2 := Then(subject, func(msg *Message) (string, error) {
+	subject2 := result.Then(subject, func(msg *message) (string, error) {
 		return msg.Text, nil
 	})
 
-	result, err := Then(subject2, func(s string) (*Message, error) {
-		return &Message{s}, nil
+	result, err := result.Then(subject2, func(s string) (*message, error) {
+		return &message{s}, nil
 	}).Get()
 
 	if err != nil {
@@ -65,7 +67,7 @@ func Test_AdvancedThen(t *testing.T) {
 }
 
 func Test_PlainError(t *testing.T) {
-	subject := Execute(FailFunc())
+	subject := result.Execute(failFunc())
 
 	_, err := subject.Get()
 
@@ -75,9 +77,9 @@ func Test_PlainError(t *testing.T) {
 }
 
 func Test_Recover(t *testing.T) {
-	subject := Execute(FailFunc())
+	subject := result.Execute(failFunc())
 
-	result, err := subject.Recover(func(err error) string {
+	result, err := result.Recover(subject, func(err error) string {
 		return err.Error()
 	}).Get()
 
@@ -91,9 +93,9 @@ func Test_Recover(t *testing.T) {
 }
 
 func Test_GetOrElseString(t *testing.T) {
-	subject := Execute(FailFunc())
+	subject := result.Execute(failFunc())
 
-	result := subject.GetOrElse(func() string {
+	result := result.GetOrElse(subject, func() string {
 		return "tada"
 	})
 
@@ -103,10 +105,10 @@ func Test_GetOrElseString(t *testing.T) {
 }
 
 func Test_GetOrElseStruct(t *testing.T) {
-	subject := Execute[*Message](nil, nil)
+	subject := result.Execute[*message](nil, nil)
 
-	result := subject.GetOrElse(func() *Message {
-		return &Message{"tada"}
+	result := result.GetOrElse(subject, func() *message {
+		return &message{"tada"}
 	})
 
 	if result.Text != "tada" {
@@ -115,9 +117,9 @@ func Test_GetOrElseStruct(t *testing.T) {
 }
 
 func Test_GetOrElseHappyString(t *testing.T) {
-	subject := Execute(OkFunc())
+	subject := result.Execute(okFunc())
 
-	result := subject.GetOrElse(func() string {
+	result := result.GetOrElse(subject, func() string {
 		return "tada"
 	})
 
@@ -127,10 +129,10 @@ func Test_GetOrElseHappyString(t *testing.T) {
 }
 
 func Test_GetOrElseHappyStruct(t *testing.T) {
-	subject := Execute(&Message{"Hello world"}, nil)
+	subject := result.Execute(&message{"Hello world"}, nil)
 
-	result := subject.GetOrElse(func() *Message {
-		return &Message{"tada"}
+	result := result.GetOrElse(subject, func() *message {
+		return &message{"tada"}
 	})
 
 	if result.Text != "Hello world" {
@@ -139,9 +141,9 @@ func Test_GetOrElseHappyStruct(t *testing.T) {
 }
 
 func Test_ThenOnFail(t *testing.T) {
-	subject := Execute(FailFunc())
+	subject := result.Execute(failFunc())
 
-	result, err := Then(subject, func(it string) (string, error) {
+	result, err := result.Then(subject, func(it string) (string, error) {
 		return fmt.Sprintf("%s!", it), nil
 	}).Get()
 
@@ -155,42 +157,10 @@ func Test_ThenOnFail(t *testing.T) {
 }
 
 func Test_RecoverOnSuccess(t *testing.T) {
-	subject := Execute(OkFunc())
+	subject := result.Execute(okFunc())
 
-	result, err := subject.Recover(func(err error) string {
+	result, err := result.Recover(subject, func(err error) string {
 		return err.Error()
-	}).Get()
-
-	if err != nil {
-		t.Errorf("there was an unexpected error: %v", err)
-	}
-
-	if result != "Hello world" {
-		t.Errorf("the result was not 'Hello world', but: %s", result)
-	}
-}
-
-func Test_OpFilterToEmpty(t *testing.T) {
-	subject := Execute(OkFunc())
-
-	result, err := subject.Filter(func(s string) bool {
-		return s == "fail"
-	}).Get()
-
-	if err != nil {
-		t.Errorf("there was an error: %v", err)
-	}
-
-	if result != "" {
-		t.Error("the result was not empty/null")
-	}
-}
-
-func Test_OpFilterToKeep(t *testing.T) {
-	subject := Execute(OkFunc())
-
-	result, err := subject.Filter(func(s string) bool {
-		return true
 	}).Get()
 
 	if err != nil {
