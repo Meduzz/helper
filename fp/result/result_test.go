@@ -105,7 +105,7 @@ func Test_GetOrElseString(t *testing.T) {
 }
 
 func Test_GetOrElseStruct(t *testing.T) {
-	subject := result.Execute[*message](nil, nil)
+	subject := result.Execute[*message](nil, errBoom)
 
 	result := result.GetOrElse(subject, func() *message {
 		return &message{"tada"}

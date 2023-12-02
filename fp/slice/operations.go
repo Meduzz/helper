@@ -1,6 +1,10 @@
 package slice
 
-import "reflect"
+import (
+	"reflect"
+
+	"github.com/Meduzz/helper/fp"
+)
 
 // Map on a slice of T returning a slice of K
 func Map[T any, K any](in []T, handler func(T) K) []K {
@@ -34,14 +38,14 @@ func Fold[T any, K any](in []T, agg K, handler func(T, K) K) K {
 }
 
 // ForEach over a slice of T
-func ForEach[T any](in []T, handler func(T)) {
+func ForEach[T any](in []T, handler fp.Consumer[T]) {
 	for _, i := range in {
 		handler(i)
 	}
 }
 
 // Filter over a slice of T returning all matches
-func Filter[T any](in []T, handler func(T) bool) []T {
+func Filter[T any](in []T, handler fp.Predicate[T]) []T {
 	type K []T
 	out := make([]T, 0)
 

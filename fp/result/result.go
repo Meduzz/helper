@@ -1,6 +1,8 @@
 package result
 
-import "reflect"
+import (
+	"github.com/Meduzz/helper/fp"
+)
 
 type (
 	// Operation is inspired by the js promise objects.
@@ -38,15 +40,36 @@ func Recover[T any](o *Operation[T], fun func(error) T) *Operation[T] {
 }
 
 // GetOrElse get T out of o, or run the provided function and return its value.
-func GetOrElse[T any](o *Operation[T], fun func() T) T {
-	if !reflect.ValueOf(o.data).IsZero() {
+func GetOrElse[T any](o *Operation[T], fun fp.Producer[T]) T {
+	if o.err == nil {
 		return o.data
 	}
 
 	return fun()
 }
 
+// Transform transform an error to another error
+func Transform[T any](o *Operation[T], op func(error) error) *Operation[T] {
+	if o.err == nil {
+		return o
+	}
+
+	var zero T
+
+	return &Operation[T]{zero, op(o.err)}
+}
+
 // Get return what ever is in o.
 func (o *Operation[T]) Get() (T, error) {
 	return o.data, o.err
+}
+
+// IsSuccess returns true if this operation was a success
+func (o *Operation[T]) IsSuccess() bool {
+	return o.err == nil
+}
+
+// IsFailure returns true if this operation was a failure
+func (o *Operation[T]) IsFailure() bool {
+	return o.err != nil
 }
