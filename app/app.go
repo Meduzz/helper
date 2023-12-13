@@ -19,11 +19,5 @@ func Initiate[T App](configFile string, app T) error {
 		return err
 	}
 
-	err = app.Start()
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return app.Start()
 }

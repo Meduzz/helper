@@ -4,8 +4,8 @@ go 1.20
 
 require (
 	github.com/Meduzz/rpc v0.0.0-20221119172413-394d0164f7af
-	github.com/Meduzz/wendy v0.0.0-20230912154832-a8b9d39ed7f6
-	github.com/Meduzz/wendy-rpc v0.0.0-20230913202925-735e4260e1a3
+	github.com/Meduzz/wendy v0.0.0-20231211211341-2c0c7791f541
+	github.com/Meduzz/wendy-rpc v0.0.0-20231211212241-818191006684
 	github.com/gin-gonic/gin v1.9.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/lib/pq v1.10.9
@@ -37,7 +37,7 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/nats-io/nkeys v0.4.6 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/pelletier/go-toml/v2 v2.1.0 // indirect
+	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect

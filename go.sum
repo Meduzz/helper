@@ -1,9 +1,9 @@
 github.com/Meduzz/rpc v0.0.0-20221119172413-394d0164f7af h1:/HVuvi/52f/dv4+v4BtS54QjgM29gFw6GKmXJNnioe4=
 github.com/Meduzz/rpc v0.0.0-20221119172413-394d0164f7af/go.mod h1:JSSVVCo8uz3aUppMt6nENUuCq3lZyNlufTgy7tRlZcQ=
-github.com/Meduzz/wendy v0.0.0-20230912154832-a8b9d39ed7f6 h1:4DKld3DDcBJWg1UhAl42nVaI4oT6ZW/vHykkzQORA1c=
-github.com/Meduzz/wendy v0.0.0-20230912154832-a8b9d39ed7f6/go.mod h1:AutDKSnD7m62i8gLAorFB4Y5ytPHbHT8Y/Lgwiak1tM=
-github.com/Meduzz/wendy-rpc v0.0.0-20230913202925-735e4260e1a3 h1:QsOhoQVSOyxBzDq0Im+/+cN7Ldd//rTOGbL0bGOApy8=
-github.com/Meduzz/wendy-rpc v0.0.0-20230913202925-735e4260e1a3/go.mod h1:fbzFEjuHG93JQq9IqrolMHJ07UV4X1cugz5g5ARucWQ=
+github.com/Meduzz/wendy v0.0.0-20231211211341-2c0c7791f541 h1:tGj8SjpU4YksF2GXWAssR8iNCmWtryGE+L4C9LvAkes=
+github.com/Meduzz/wendy v0.0.0-20231211211341-2c0c7791f541/go.mod h1:AutDKSnD7m62i8gLAorFB4Y5ytPHbHT8Y/Lgwiak1tM=
+github.com/Meduzz/wendy-rpc v0.0.0-20231211212241-818191006684 h1:hUpPKS5vEZGp8v4IVAa+03dQj7A8NyNXAIDK+J0KGkQ=
+github.com/Meduzz/wendy-rpc v0.0.0-20231211212241-818191006684/go.mod h1:AGgSRxYjNxIMztoHIrvz78NSTnj117zXoEBJrHoPRzY=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.10.0-rc/go.mod h1:ElCzW+ufi8qKqNW0FY314xriJhyJhuoJ3gFZdAHF7NM=
 github.com/bytedance/sonic v1.10.2 h1:GQebETVBxYB7JGWJtLBi07OVzWwt+8dWA00gEVW2ZFE=
@@ -77,8 +77,8 @@ github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OS
 github.com/nxadm/tail v1.4.8 h1:nPr65rt6Y5JFSKQO7qToXr7pePgD6Gwiw05lkbyAQTE=
 github.com/onsi/ginkgo v1.16.5 h1:8xi0RTUf59SOSfEtZMvwTvXYMzG4gV23XVHOZiXNtnE=
 github.com/onsi/gomega v1.18.1 h1:M1GfJqGRrBrrGGsbxzV5dqM2U2ApXefZCQpkukxYRLE=
-github.com/pelletier/go-toml/v2 v2.1.0 h1:FnwAJ4oYMvbT/34k9zzHuZNrhlz48GB3/s6at6/MHO4=
-github.com/pelletier/go-toml/v2 v2.1.0/go.mod h1:tJU2Z3ZkXwnxa4DPO899bsyIoywizdUvyaeZurnPPDc=
+github.com/pelletier/go-toml/v2 v2.1.1 h1:LWAJwfNvjQZCFIDKWYQaM62NcYeYViCmWIwmOStowAI=
+github.com/pelletier/go-toml/v2 v2.1.1/go.mod h1:tJU2Z3ZkXwnxa4DPO899bsyIoywizdUvyaeZurnPPDc=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
