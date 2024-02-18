@@ -29,6 +29,29 @@ func Then[T any, Z any](op *Operation[T], fun func(it T) (Z, error)) *Operation[
 	return Execute(fun(op.data))
 }
 
+// Map allows you to map on a successful operation to chang the value
+// of the "container", will do nothing if op is failed.
+func Map[T any, Z any](op *Operation[T], fun func(i T) Z) *Operation[Z] {
+	if op.err == nil {
+		return &Operation[Z]{fun(op.data), nil}
+	}
+
+	var z Z
+
+	return &Operation[Z]{z, op.err}
+}
+
+// FlatMap lets you execute a function that already returns a result, with the value of
+// of an result. If op is failed, then nothing happens.
+func FlatMap[T any, Z any](op *Operation[T], fun func(T) *Operation[Z]) *Operation[Z] {
+	if op.err != nil {
+		var z Z
+		return &Operation[Z]{z, op.err}
+	}
+
+	return fun(op.data)
+}
+
 // Recover from an error, by turning it into a T.
 // This function is safe to execute even if there's no errors.
 func Recover[T any](o *Operation[T], fun func(error) T) *Operation[T] {
