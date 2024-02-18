@@ -171,3 +171,103 @@ func Test_RecoverOnSuccess(t *testing.T) {
 		t.Errorf("the result was not 'Hello world', but: %s", result)
 	}
 }
+
+func Test_MapHappyCase(t *testing.T) {
+	subject := result.Execute[string](okFunc())
+	data := result.Map[string, *message](subject, func(in string) *message {
+		return &message{in}
+	})
+
+	if data == nil {
+		t.Error("data is nil")
+	}
+
+	if data.IsFailure() {
+		t.Error("data is failure")
+	}
+
+	msg, err := data.Get()
+
+	if err != nil {
+		t.Error("error was set")
+	}
+
+	if msg.Text != "Hello world" {
+		t.Errorf("message was not '%s' but '%s", "Hello world", msg.Text)
+	}
+}
+
+func Test_MapUnhappyCase(t *testing.T) {
+	subject := result.Execute[string](failFunc())
+	data := result.Map(subject, func(in string) *message {
+		return &message{in}
+	})
+
+	if data == nil {
+		t.Error("data was nil")
+	}
+
+	if data.IsSuccess() {
+		t.Error("data was a success")
+	}
+
+	val, err := data.Get()
+
+	if val != nil {
+		t.Error("value was set")
+	}
+
+	if err != errBoom {
+		t.Error("error was not boom")
+	}
+}
+
+func Test_FlatMapHappyCase(t *testing.T) {
+	subject := result.Execute(okFunc())
+	data := result.FlatMap(subject, func(in string) *result.Operation[*message] {
+		return result.Execute(StructFunc(in))
+	})
+
+	if data == nil {
+		t.Error("data was nil")
+	}
+
+	if data.IsFailure() {
+		t.Error("data was a failure")
+	}
+
+	msg, err := data.Get()
+
+	if err != nil {
+		t.Error("err was set")
+	}
+
+	if msg.Text != "Hello world" {
+		t.Error("msg was not correct")
+	}
+}
+
+func Test_FlatMapUnhappyCase(t *testing.T) {
+	subject := result.Execute(failFunc())
+	data := result.FlatMap(subject, func(in string) *result.Operation[*message] {
+		return result.Execute(StructFunc(in))
+	})
+
+	if data == nil {
+		t.Error("data was nil")
+	}
+
+	if data.IsSuccess() {
+		t.Error("data was a success")
+	}
+
+	msg, err := data.Get()
+
+	if msg != nil {
+		t.Error("msg was set")
+	}
+
+	if err != errBoom {
+		t.Error("error was not boom")
+	}
+}
