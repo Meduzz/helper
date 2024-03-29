@@ -12,6 +12,16 @@ func TestPartition(t *testing.T) {
 	if len(result) != 5 {
 		t.Errorf("result of partition was not 5 but %d", len(result))
 	}
+
+	first := result[0]
+
+	if len(first) != 2 {
+		t.Errorf("length of first was not 2 but %d", len(first))
+	}
+
+	if first[0] != 1 || first[1] != 2 {
+		t.Errorf("first was not correct was %d & %d", first[0], first[1])
+	}
 }
 
 func TestLengthOfSkip(t *testing.T) {

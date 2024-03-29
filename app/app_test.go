@@ -3,6 +3,7 @@ package app_test
 import (
 	"errors"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/Meduzz/helper/app"
@@ -10,8 +11,8 @@ import (
 
 type (
 	goodConfig struct {
-		Name string `json:"name"`
-		Age  int    `json:"age" env:"AGE"`
+		Name string `json:"name" env:"TEST_NAME"`
+		Age  int    `json:"age" env:"TEST_AGE"`
 	}
 
 	badConfig struct {
@@ -61,6 +62,29 @@ func TestSadCase(t *testing.T) {
 
 	if !errors.Is(err, demand) {
 		t.Errorf("error was not %v but %v\n", demand, err)
+		t.FailNow()
+	}
+}
+
+func TestNoFile(t *testing.T) {
+	os.Setenv("TEST_NAME", "Test Testsson")
+	os.Setenv("TEST_AGE", "100")
+
+	config := &goodConfig{}
+	err := app.Initiate("", config)
+
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+
+	if config.Name != "Test Testsson" {
+		t.Errorf("Name was not Test Testsson but %s\n", config.Name)
+		t.FailNow()
+	}
+
+	if config.Age != 100 {
+		t.Errorf("Age was not 100 but %d\n", config.Age)
 		t.FailNow()
 	}
 }

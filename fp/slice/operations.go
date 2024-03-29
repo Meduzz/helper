@@ -109,21 +109,22 @@ func Skip[T any](in []T, count int) []T {
 // Partition splits slice of T into chunks of size
 func Partition[T any](in []T, size int) [][]T {
 	out := make([][]T, 0)
-	step := make([]T, size)
-	count := 0
+	step := make([]T, 0)
 
 	ForEach(in, func(t T) {
-		if count == size {
-			out = append(out, step)
-			count = 0
-			step = make([]T, size)
-		}
-
 		step = append(step, t)
-		count++
+
+		if len(step) == size {
+			out = append(out, step)
+			step = make([]T, 0)
+		}
 	})
 
-	return append(out, step)
+	if len(step) != 0 {
+		return append(out, step)
+	} else {
+		return out
+	}
 }
 
 // Group a slice of T into a map[string][]T
