@@ -3,11 +3,11 @@ package starters
 import (
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/rpc"
-	"github.com/Meduzz/rpc/api"
+	"github.com/Meduzz/rpc/encoding"
 	"github.com/spf13/cobra"
 )
 
-func RpcMethod(handler api.Handler) *cobra.Command {
+func RpcMethod(handler rpc.RpcHandler) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "start a rpc method",
@@ -23,9 +23,9 @@ func RpcMethod(handler api.Handler) *cobra.Command {
 			return err
 		}
 
-		srv := rpc.NewRpc(conn)
+		srv := rpc.NewRpc(conn, encoding.Json())
 
-		srv.Handler(*topic, *queue, handler)
+		srv.HandleRPC(*topic, *queue, handler)
 
 		srv.Run()
 

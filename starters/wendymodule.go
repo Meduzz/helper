@@ -8,22 +8,28 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func WendyModule(module *wendy.Module) *cobra.Command {
+func WendyModule(prefix string, module *wendy.Module) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "start a wendy module on top of a nats conn",
 	}
 
-	queue := cmd.Flags().StringP("queue", "q", "", "set queue group or leave empty")
+	cmd.Flags().String("q", "", "set queue group or leave empty")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		queue, err := cmd.Flags().GetString("q")
+
+		if err != nil {
+			return err
+		}
+
 		conn, err := nuts.Connect()
 
 		if err != nil {
 			return err
 		}
 
-		err = wendyrpc.ServeModules(conn, *queue, module)
+		err = wendyrpc.ServeModules(conn, queue, prefix, module)
 
 		if err != nil {
 			return err

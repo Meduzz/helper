@@ -3,6 +3,7 @@ package starters
 import (
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/rpc"
+	"github.com/Meduzz/rpc/encoding"
 	"github.com/spf13/cobra"
 )
 
@@ -19,7 +20,7 @@ func Rpc(setup func(*rpc.RPC)) *cobra.Command {
 			return err
 		}
 
-		srv := rpc.NewRpc(conn)
+		srv := rpc.NewRpc(conn, encoding.Json())
 
 		setup(srv)
 

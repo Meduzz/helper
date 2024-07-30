@@ -1,6 +1,8 @@
 package starters
 
 import (
+	"fmt"
+
 	"github.com/Meduzz/helper/block"
 	"github.com/Meduzz/helper/nuts"
 	"github.com/Meduzz/wendy"
@@ -14,16 +16,28 @@ func WendyMethod(app, module, method string, handler wendy.Handler) *cobra.Comma
 		Short: "start a wendy method",
 	}
 
-	queue := cmd.Flags().StringP("queue", "q", "", "set queue group for nats topic")
+	cmd.Flags().String("q", "", "set queue group for nats topic")
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
+		queue, err := cmd.Flags().GetString("q")
+
+		if err != nil {
+			return err
+		}
+
 		conn, err := nuts.Connect()
 
 		if err != nil {
 			return err
 		}
 
-		err = wendyrpc.ServeMethod(conn, *queue, app, module, method, handler)
+		topic := fmt.Sprintf("%s.%s.%s", app, module, method)
+
+		if app == "" {
+			topic = fmt.Sprintf("%s.%s", module, method)
+		}
+
+		err = wendyrpc.ServeMethod(conn, queue, topic, handler)
 
 		if err != nil {
 			return err
