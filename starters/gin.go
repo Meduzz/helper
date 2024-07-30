@@ -8,7 +8,7 @@ import (
 )
 
 // Gin - starts a gin webserver based on what's setup in the setup lambda.
-func Gin(port int, setup func(*gin.Engine)) *cobra.Command {
+func Gin(port int, setup func(*cobra.Command, *gin.Engine)) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "start a gin server",
@@ -18,7 +18,7 @@ func Gin(port int, setup func(*gin.Engine)) *cobra.Command {
 
 	cmd.RunE = func(cmd *cobra.Command, args []string) error {
 		srv := gin.Default()
-		setup(srv)
+		setup(cmd, srv)
 
 		return srv.Run(fmt.Sprintf(":%d", *actualPort))
 	}

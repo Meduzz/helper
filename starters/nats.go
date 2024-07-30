@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Nats(setup func(*nats.Conn)) *cobra.Command {
+func Nats(setup func(*cobra.Command, *nats.Conn)) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "start the nats handler",
@@ -20,7 +20,7 @@ func Nats(setup func(*nats.Conn)) *cobra.Command {
 			return err
 		}
 
-		setup(conn)
+		setup(cmd, conn)
 
 		defer conn.Close()
 

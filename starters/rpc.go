@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func Rpc(setup func(*rpc.RPC)) *cobra.Command {
+func Rpc(setup func(*cobra.Command, *rpc.RPC)) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
 		Short: "start a rpc module",
@@ -22,7 +22,7 @@ func Rpc(setup func(*rpc.RPC)) *cobra.Command {
 
 		srv := rpc.NewRpc(conn, encoding.Json())
 
-		setup(srv)
+		setup(cmd, srv)
 
 		srv.Run()
 
