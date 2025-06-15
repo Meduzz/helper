@@ -7,6 +7,14 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+type (
+	Config struct {
+		Host      string `json:"host"`
+		Username  string `json:"username,omitempty"`
+		Passsword string `json:"password,omitempty"`
+	}
+)
+
 func Connect() *redis.Client {
 	address := os.Getenv("REDIS_ADDRESS")
 	username := os.Getenv("REDIS_USERNAME")
@@ -33,4 +41,8 @@ func Connnect(address, username, password string) *redis.Client {
 		Username: username,
 		Password: password,
 	})
+}
+
+func ConnectFromConfig(cfg *Config) *redis.Client {
+	return Connnect(cfg.Host, cfg.Username, cfg.Passsword)
 }
