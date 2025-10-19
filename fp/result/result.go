@@ -2,6 +2,7 @@ package result
 
 import (
 	"github.com/Meduzz/helper/fp"
+	"github.com/Meduzz/helper/fp/slice"
 )
 
 type (
@@ -94,6 +95,18 @@ func Transform[T any](o *Operation[T], op func(error) error) *Operation[T] {
 	var zero T
 
 	return &Operation[T]{zero, op(o.err)}
+}
+
+// Batch executes provided op on provided data slice and returns a single Operation containing the result as an array or the first error.
+func Batch[T any, K any](data []T, op func(T) (K, error)) *Operation[[]K] {
+	return slice.Fold(data, Success(make([]K, 0)), func(item T, agg *Operation[[]K]) *Operation[[]K] {
+		return FlatMap(agg, func(items []K) *Operation[[]K] {
+			result := Execute(op(item))
+			return Map(result, func(it K) []K {
+				return append(items, it)
+			})
+		})
+	})
 }
 
 // Get return what ever is in o.

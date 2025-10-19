@@ -173,8 +173,8 @@ func Test_RecoverOnSuccess(t *testing.T) {
 }
 
 func Test_MapHappyCase(t *testing.T) {
-	subject := result.Execute[string](okFunc())
-	data := result.Map[string, *message](subject, func(in string) *message {
+	subject := result.Execute(okFunc())
+	data := result.Map(subject, func(in string) *message {
 		return &message{in}
 	})
 
@@ -198,7 +198,7 @@ func Test_MapHappyCase(t *testing.T) {
 }
 
 func Test_MapUnhappyCase(t *testing.T) {
-	subject := result.Execute[string](failFunc())
+	subject := result.Execute(failFunc())
 	data := result.Map(subject, func(in string) *message {
 		return &message{in}
 	})
@@ -270,4 +270,45 @@ func Test_FlatMapUnhappyCase(t *testing.T) {
 	if err != errBoom {
 		t.Error("error was not boom")
 	}
+}
+
+func Test_Batch(t *testing.T) {
+	happy := []string{
+		"hello",
+		"bai",
+	}
+
+	unhappy := []string{
+		"hello",
+		"bai",
+		"error",
+	}
+
+	t.Run("happy case", func(t *testing.T) {
+		subject := result.Batch(happy, StructFunc)
+
+		if subject.IsFailure() {
+			t.Error("subject was a failure")
+		}
+
+		items, _ := subject.Get()
+
+		if len(items) != 2 {
+			t.Errorf("items length was not 2 but %d", len(items))
+		}
+	})
+
+	t.Run("unhappy case", func(t *testing.T) {
+		subject := result.Batch(unhappy, StructFunc)
+
+		if subject.IsSuccess() {
+			t.Error("subject was a success")
+		}
+
+		_, err := subject.Get()
+
+		if err.Error() != "error" {
+			t.Errorf("error was not 'error' but '%s'", err.Error())
+		}
+	})
 }

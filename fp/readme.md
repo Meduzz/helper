@@ -10,4 +10,4 @@ For all your needs in this department, look at the slice package.
 
 ## Todo
 
-On the horizon im looking to add a box package with subpackages for Optional, Operation & perhaps one more.
+On the horizon im looking to add a box package with subpackages for Optional & perhaps one more.
