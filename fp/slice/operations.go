@@ -176,3 +176,16 @@ func Contains[T any](in []T, needle T) bool {
 		return reflect.DeepEqual(t, needle)
 	}))
 }
+
+// Join, joins 2 slices into a map.
+func Join[T comparable, K any](keys []T, values []K) map[T]K {
+	out := make(map[T]K)
+
+	if len(keys) == len(values) {
+		for i, key := range keys {
+			out[key] = values[i]
+		}
+	}
+
+	return out
+}

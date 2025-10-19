@@ -1,6 +1,8 @@
 package slice
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -105,5 +107,23 @@ func TestHeadTailBounds(t *testing.T) {
 
 	if len(skipResult) > 0 {
 		t.Error("skipResult of partial was not empty")
+	}
+}
+
+func TestJoin(t *testing.T) {
+	values := Map(subject, func(it int) string {
+		return fmt.Sprintf("Item%d", it)
+	})
+
+	result := Join(subject, values)
+
+	if len(result) != len(subject) {
+		t.Error("lenght of result does not match length of subject")
+	}
+
+	for k, v := range result {
+		if !strings.Contains(v, fmt.Sprintf("%d", k)) {
+			t.Error("value does not contain key")
+		}
 	}
 }
