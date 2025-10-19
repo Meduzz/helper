@@ -1,3 +1,5 @@
+github.com/Meduzz/rpc v0.0.0-20240915092337-79dc2ae29496 h1:Zgt0GMcLn0/BsLeZrsXwls52uVeIU/vC5xRThhfF28I=
+github.com/Meduzz/rpc v0.0.0-20240915092337-79dc2ae29496/go.mod h1:86w2Hl+NwOg47Dz02f2tWw7i4S1I72hQxkAY9nIp8vM=
 github.com/bytedance/gopkg v0.1.3 h1:TPBSwH8RsouGCBcMBktLt1AymVo2TVsBVCY4b6TnZ/M=
 github.com/bytedance/gopkg v0.1.3/go.mod h1:576VvJ+eJgyCzdjS+c4+77QF3p7ubbtiKARP3TxducM=
 github.com/bytedance/sonic v1.14.1 h1:FBMC0zVz5XUmE4z9wF4Jey0An5FueFvOsTKKKtwIl7w=

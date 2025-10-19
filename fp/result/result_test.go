@@ -1,11 +1,9 @@
-package result_test
+package result
 
 import (
 	"errors"
 	"fmt"
 	"testing"
-
-	"github.com/Meduzz/helper/fp/result"
 )
 
 var errBoom = errors.New("poff")
@@ -31,9 +29,9 @@ func StructFunc(msg string) (*message, error) {
 }
 
 func Test_Then(t *testing.T) {
-	subject := result.Execute(okFunc())
+	subject := Execute(okFunc())
 
-	result, err := result.Then(subject, func(s string) (string, error) {
+	result, err := Then(subject, func(s string) (string, error) {
 		return fmt.Sprintf("%s!", s), nil
 	}).Get()
 
@@ -47,13 +45,13 @@ func Test_Then(t *testing.T) {
 }
 
 func Test_AdvancedThen(t *testing.T) {
-	subject := result.Execute(StructFunc("Hello world"))
+	subject := Execute(StructFunc("Hello world"))
 
-	subject2 := result.Then(subject, func(msg *message) (string, error) {
+	subject2 := Then(subject, func(msg *message) (string, error) {
 		return msg.Text, nil
 	})
 
-	result, err := result.Then(subject2, func(s string) (*message, error) {
+	result, err := Then(subject2, func(s string) (*message, error) {
 		return &message{s}, nil
 	}).Get()
 
@@ -67,7 +65,7 @@ func Test_AdvancedThen(t *testing.T) {
 }
 
 func Test_PlainError(t *testing.T) {
-	subject := result.Execute(failFunc())
+	subject := Execute(failFunc())
 
 	_, err := subject.Get()
 
@@ -77,9 +75,9 @@ func Test_PlainError(t *testing.T) {
 }
 
 func Test_Recover(t *testing.T) {
-	subject := result.Failure[string](errBoom)
+	subject := Failure[string](errBoom)
 
-	result, err := result.Recover(subject, func(err error) string {
+	result, err := Recover(subject, func(err error) string {
 		return err.Error()
 	}).Get()
 
@@ -93,9 +91,9 @@ func Test_Recover(t *testing.T) {
 }
 
 func Test_GetOrElseString(t *testing.T) {
-	subject := result.Execute(failFunc())
+	subject := Execute(failFunc())
 
-	result := result.GetOrElse(subject, func() string {
+	result := GetOrElse(subject, func() string {
 		return "tada"
 	})
 
@@ -105,9 +103,9 @@ func Test_GetOrElseString(t *testing.T) {
 }
 
 func Test_GetOrElseStruct(t *testing.T) {
-	subject := result.Execute[*message](nil, errBoom)
+	subject := Execute[*message](nil, errBoom)
 
-	result := result.GetOrElse(subject, func() *message {
+	result := GetOrElse(subject, func() *message {
 		return &message{"tada"}
 	})
 
@@ -117,9 +115,9 @@ func Test_GetOrElseStruct(t *testing.T) {
 }
 
 func Test_GetOrElseHappyString(t *testing.T) {
-	subject := result.Execute(okFunc())
+	subject := Execute(okFunc())
 
-	result := result.GetOrElse(subject, func() string {
+	result := GetOrElse(subject, func() string {
 		return "tada"
 	})
 
@@ -129,9 +127,9 @@ func Test_GetOrElseHappyString(t *testing.T) {
 }
 
 func Test_GetOrElseHappyStruct(t *testing.T) {
-	subject := result.Success(&message{"Hello world"})
+	subject := Success(&message{"Hello world"})
 
-	result := result.GetOrElse(subject, func() *message {
+	result := GetOrElse(subject, func() *message {
 		return &message{"tada"}
 	})
 
@@ -141,9 +139,9 @@ func Test_GetOrElseHappyStruct(t *testing.T) {
 }
 
 func Test_ThenOnFail(t *testing.T) {
-	subject := result.Execute(failFunc())
+	subject := Execute(failFunc())
 
-	result, err := result.Then(subject, func(it string) (string, error) {
+	result, err := Then(subject, func(it string) (string, error) {
 		return fmt.Sprintf("%s!", it), nil
 	}).Get()
 
@@ -157,9 +155,9 @@ func Test_ThenOnFail(t *testing.T) {
 }
 
 func Test_RecoverOnSuccess(t *testing.T) {
-	subject := result.Execute(okFunc())
+	subject := Execute(okFunc())
 
-	result, err := result.Recover(subject, func(err error) string {
+	result, err := Recover(subject, func(err error) string {
 		return err.Error()
 	}).Get()
 
@@ -173,8 +171,8 @@ func Test_RecoverOnSuccess(t *testing.T) {
 }
 
 func Test_MapHappyCase(t *testing.T) {
-	subject := result.Execute(okFunc())
-	data := result.Map(subject, func(in string) *message {
+	subject := Execute(okFunc())
+	data := Map(subject, func(in string) *message {
 		return &message{in}
 	})
 
@@ -198,8 +196,8 @@ func Test_MapHappyCase(t *testing.T) {
 }
 
 func Test_MapUnhappyCase(t *testing.T) {
-	subject := result.Execute(failFunc())
-	data := result.Map(subject, func(in string) *message {
+	subject := Execute(failFunc())
+	data := Map(subject, func(in string) *message {
 		return &message{in}
 	})
 
@@ -223,9 +221,9 @@ func Test_MapUnhappyCase(t *testing.T) {
 }
 
 func Test_FlatMapHappyCase(t *testing.T) {
-	subject := result.Execute(okFunc())
-	data := result.FlatMap(subject, func(in string) *result.Operation[*message] {
-		return result.Execute(StructFunc(in))
+	subject := Execute(okFunc())
+	data := FlatMap(subject, func(in string) *Operation[*message] {
+		return Execute(StructFunc(in))
 	})
 
 	if data == nil {
@@ -248,9 +246,9 @@ func Test_FlatMapHappyCase(t *testing.T) {
 }
 
 func Test_FlatMapUnhappyCase(t *testing.T) {
-	subject := result.Execute(failFunc())
-	data := result.FlatMap(subject, func(in string) *result.Operation[*message] {
-		return result.Execute(StructFunc(in))
+	subject := Execute(failFunc())
+	data := FlatMap(subject, func(in string) *Operation[*message] {
+		return Execute(StructFunc(in))
 	})
 
 	if data == nil {
@@ -285,7 +283,7 @@ func Test_Batch(t *testing.T) {
 	}
 
 	t.Run("happy case", func(t *testing.T) {
-		subject := result.Batch(happy, StructFunc)
+		subject := Batch(happy, StructFunc)
 
 		if subject.IsFailure() {
 			t.Error("subject was a failure")
@@ -299,7 +297,7 @@ func Test_Batch(t *testing.T) {
 	})
 
 	t.Run("unhappy case", func(t *testing.T) {
-		subject := result.Batch(unhappy, StructFunc)
+		subject := Batch(unhappy, StructFunc)
 
 		if subject.IsSuccess() {
 			t.Error("subject was a success")
