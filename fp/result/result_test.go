@@ -77,7 +77,7 @@ func Test_PlainError(t *testing.T) {
 }
 
 func Test_Recover(t *testing.T) {
-	subject := result.Execute(failFunc())
+	subject := result.Failure[string](errBoom)
 
 	result, err := result.Recover(subject, func(err error) string {
 		return err.Error()
@@ -129,7 +129,7 @@ func Test_GetOrElseHappyString(t *testing.T) {
 }
 
 func Test_GetOrElseHappyStruct(t *testing.T) {
-	subject := result.Execute(&message{"Hello world"}, nil)
+	subject := result.Success(&message{"Hello world"})
 
 	result := result.GetOrElse(subject, func() *message {
 		return &message{"tada"}

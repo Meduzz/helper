@@ -17,6 +17,20 @@ func Execute[T any](data T, err error) *Operation[T] {
 	return &Operation[T]{data, err}
 }
 
+// Success creates a operation from the provided data.
+func Success[T any](data T) *Operation[T] {
+	return &Operation[T]{
+		data: data,
+	}
+}
+
+// Failure creates an operation from the provided error.
+func Failure[T any](err error) *Operation[T] {
+	return &Operation[T]{
+		err: err,
+	}
+}
+
 // Then execute a function that accepts T and returns (Z, error).
 // Will return previous error if present in op.
 func Then[T any, Z any](op *Operation[T], fun func(it T) (Z, error)) *Operation[Z] {
