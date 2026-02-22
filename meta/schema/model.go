@@ -24,6 +24,12 @@ type (
 		Defs       map[string]*Schema `json:"$defs,omitempty"`
 		json.RawMessage
 	}
+
+	// SchemaHook allows you to affect schema generation for structs. Due to reflection, this must not be bound to a pointer of your struct but the defined struct ie `func (MyStruct) Enchance(...)`
+	SchemaHook interface {
+		// Enchance is called once per field and allow you to mutate the fields schema to your hearts delight.
+		Enchance(field string, schema *Schema)
+	}
 )
 
 const (

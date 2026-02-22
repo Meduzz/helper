@@ -8,9 +8,9 @@ import (
 func SchemaFor(it any) *Schema {
 	s := &Schema{}
 
-	v := reflect.ValueOf(it)
+	v := reflect.TypeOf(it)
 
-	schemaFor(v.Type(), s)
+	schemaFor(v, s)
 
 	return s
 }
@@ -65,6 +65,12 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 
 			if ok {
 				jsonTag = strings.Replace(jsonTag, "string", "", -1)
+
+				// ignore json ignored fields
+				if jsonTag == "-" {
+					continue
+				}
+
 				tagContent := strings.Split(jsonTag, ",")
 
 				for _, it := range tagContent {
@@ -73,7 +79,7 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 							nullable = true
 							required = false
 						} else {
-							// sketchy
+							// ~sketchy~ working 🎉
 							name = it
 						}
 					}
@@ -82,6 +88,16 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 
 			builder.Property(name, required, nullable, func(sb SchemaBuilder) {
 				schemaFor(rf.Type, sb.Schema())
+
+				// give structs that implements SchemaHook, speciul treatment.
+				if v.AssignableTo(reflect.TypeOf((*SchemaHook)(nil)).Elem()) {
+					vValue := reflect.New(v).Interface()
+					hook, ok := vValue.(SchemaHook)
+
+					if ok {
+						hook.Enchance(name, sb.Schema())
+					}
+				}
 			})
 		}
 	}

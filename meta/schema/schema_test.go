@@ -9,9 +9,14 @@ import (
 
 type (
 	Person struct {
-		Name string `json:"name"`
-		Age  int    `json:"age,omitempty"`
+		Name  string `json:"name"`
+		Age   int    `json:"omitempty"`
+		Email string `json:"-"`
 	}
+)
+
+var (
+	_ schema.SchemaHook = Person{}
 )
 
 func TestSchema(t *testing.T) {
@@ -192,8 +197,12 @@ func TestSchema(t *testing.T) {
 				t.Error("name was not marked as required")
 			}
 
+			if len(subject.Properties) != 2 {
+				t.Error("there's not excactly 2 fields in the properties")
+			}
+
 			nameSchema, nameOk := subject.Properties["name"]
-			ageSchema, ageOk := subject.Properties["age"]
+			ageSchema, ageOk := subject.Properties["Age"] // struct field name (since no name in json tag)
 
 			if !nameOk {
 				t.Error("name waas not set")
@@ -209,6 +218,14 @@ func TestSchema(t *testing.T) {
 
 			if !contains(ageSchema.Type, schema.Null) {
 				t.Error("age was not marked as nullable")
+			}
+
+			if ageSchema.Minimum != 18 {
+				t.Error("minimum was not set to 18")
+			}
+
+			if ageSchema.Maximum != 100 {
+				t.Error("maximum was not set to 100")
 			}
 		})
 
@@ -264,4 +281,12 @@ func TestSchema(t *testing.T) {
 
 func contains[T any](schema []T, kind T) bool {
 	return slice.Contains(schema, kind)
+}
+
+func (Person) Enchance(field string, schemah *schema.Schema) {
+	if field == "Age" {
+		builder := schema.NewNumberBuilder(schemah)
+		builder.Minimum(18)
+		builder.Maximum(100)
+	}
 }
