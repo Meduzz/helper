@@ -1,7 +1,5 @@
 package schema
 
-import "encoding/json"
-
 type (
 	Kind string
 
@@ -22,7 +20,6 @@ type (
 		MaxItems   int64              `json:"maxItems,omitempty"`
 		Id         string             `json:"$id,omitempty"`
 		Defs       map[string]*Schema `json:"$defs,omitempty"`
-		json.RawMessage
 	}
 
 	// SchemaHook allows you to affect schema generation for structs. Due to reflection, this must not be bound to a pointer of your struct but the defined struct ie `func (MyStruct) Enchance(...)`

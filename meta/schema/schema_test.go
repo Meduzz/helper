@@ -1,6 +1,7 @@
 package schema_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/Meduzz/helper/fp/slice"
@@ -274,6 +275,64 @@ func TestSchema(t *testing.T) {
 
 			if !contains(subject.Items.Type, schema.Integer) {
 				t.Error("items.type was not integer")
+			}
+		})
+	})
+
+	t.Run("JSON", func(t *testing.T) {
+		t.Run("structs", func(t *testing.T) {
+			subject := schema.SchemaFor(&Person{})
+
+			jsonData, err := json.Marshal(subject)
+
+			if err != nil {
+				t.Errorf("marshaling threw error: %v", err)
+			}
+
+			subject = &schema.Schema{}
+			err = json.Unmarshal(jsonData, subject)
+
+			if subject.Id != "Person" {
+				t.Error("schema id was not Person")
+			}
+
+			if !contains(subject.Type, schema.Object) {
+				t.Error("schema was not marked as object")
+			}
+
+			if !contains(subject.Required, "name") {
+				t.Error("name was not marked as required")
+			}
+
+			if len(subject.Properties) != 2 {
+				t.Error("there's not excactly 2 fields in the properties")
+			}
+
+			nameSchema, nameOk := subject.Properties["name"]
+			ageSchema, ageOk := subject.Properties["Age"] // struct field name (since no name in json tag)
+
+			if !nameOk {
+				t.Error("name waas not set")
+			}
+
+			if contains(nameSchema.Type, schema.Null) {
+				t.Error("name was marked as nullable")
+			}
+
+			if !ageOk {
+				t.Error("age was not set")
+			}
+
+			if !contains(ageSchema.Type, schema.Null) {
+				t.Error("age was not marked as nullable")
+			}
+
+			if ageSchema.Minimum != 18 {
+				t.Error("minimum was not set to 18")
+			}
+
+			if ageSchema.Maximum != 100 {
+				t.Error("maximum was not set to 100")
 			}
 		})
 	})
