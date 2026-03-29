@@ -3,6 +3,7 @@ package block
 import (
 	"errors"
 	"log"
+	"os"
 	"sync"
 
 	"github.com/Meduzz/helper/fp/slice"
@@ -13,7 +14,7 @@ var (
 	mu    = &sync.RWMutex{}
 )
 
-func init() {
+func EnableHooks() {
 	go func() {
 		err := Block(func() error {
 			mu.RLock()
@@ -31,8 +32,10 @@ func init() {
 		})
 
 		if err != nil {
-			log.Fatalf("Shutdown hooks threw error(s): %v\n", err) // TODO good enough?
+			log.Fatalf("Shutdown hooks threw error(s): %v\n", err) // should result in os.Exit(1)
 		}
+
+		os.Exit(0)
 	}()
 }
 
