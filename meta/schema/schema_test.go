@@ -14,6 +14,11 @@ type (
 		Age   int    `json:"omitempty"`
 		Email string `json:"-"`
 	}
+
+	Node struct {
+		Name       string                    `json:"name"`
+		Properties map[string]*schema.Schema `json:"properties"`
+	}
 )
 
 var (
@@ -335,6 +340,62 @@ func TestSchema(t *testing.T) {
 				t.Error("maximum was not set to 100")
 			}
 		})
+	})
+
+	t.Run("Schema for Schema for Schema", func(t *testing.T) {
+		subject := schema.SchemaFor(&Node{})
+
+		if subject == nil {
+			t.Fatal("abooh")
+		}
+
+		if subject.Id != "Node" {
+			t.Fatalf("id was not Node but %s", subject.Id)
+		}
+
+		if len(subject.Properties) != 2 {
+			t.Fatalf("number of properties is not 2 but %d", len(subject.Properties))
+		}
+
+		if len(subject.Defs) == 0 {
+			t.Fatal("defs was not set")
+		}
+
+		props, exist := subject.Properties["properties"]
+
+		if !exist {
+			t.Fatal("value did not exist")
+		}
+
+		if !contains(props.Type, schema.Object) {
+			t.Fatal("type was not object")
+		}
+
+		if props.AdditionalProperties == nil {
+			t.Fatal("props of props was not set")
+		}
+
+		propsProps, ok := props.AdditionalProperties.(*schema.Schema)
+
+		if !ok {
+			t.Fatal("additional props was not schema")
+		}
+
+		if propsProps.Ref != "#/$defs/schema" {
+			t.Fatalf("ref was not schema but %s", props.Ref)
+		}
+	})
+
+	t.Run("On the safe side", func(t *testing.T) {
+		subject := schema.SchemaFor(schema.Schema{})
+
+		if subject.Id != "Schema" {
+			t.Fatalf("id was not Schema but %s", subject.Id)
+		}
+
+		if len(subject.Properties) != 17 {
+			t.Fatalf("property length was not 17 but %d", len(subject.Properties))
+		}
 	})
 }
 

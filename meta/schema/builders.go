@@ -35,11 +35,19 @@ func (s *schemaBuilder) Object(cb func(ObjectBuilder)) {
 }
 
 func (s *schemaBuilder) Number(cb func(NumberBuilder)) {
-	cb(NewNumberBuilder(s.schema))
+	if cb != nil {
+		cb(NewNumberBuilder(s.schema))
+	} else {
+		s.schema.Type = append(s.schema.Type, Number)
+	}
 }
 
 func (s *schemaBuilder) String(cb func(StringBuilder)) {
-	cb(NewStringBuilder(s.schema))
+	if cb != nil {
+		cb(NewStringBuilder(s.schema))
+	} else {
+		s.schema.Type = append(s.schema.Type, String)
+	}
 }
 
 func (s *schemaBuilder) Boolean() {
@@ -52,6 +60,10 @@ func (s *schemaBuilder) Array(cb func(ArrayBuilder)) {
 
 func (s *schemaBuilder) Default(defaultValue any) {
 	s.schema.Default = defaultValue
+}
+
+func (s *schemaBuilder) Ref(id string) {
+	s.schema.Ref = id
 }
 
 func (s *schemaBuilder) Schema() *Schema {
@@ -81,7 +93,12 @@ func (o *objectBuilder) Property(property string, required, nullable bool, cb fu
 
 	cb(NewSchemaBuilder(propertySchema))
 
+	bubbleDefs(o.schema, propertySchema)
 	o.schema.Properties[property] = propertySchema
+}
+
+func (o *objectBuilder) AdditionalProperties(boolOrSchema any) {
+	o.schema.AdditionalProperties = boolOrSchema
 }
 
 func (o *objectBuilder) Id(id string) {
@@ -165,9 +182,30 @@ func (a *arrayBuilder) Maximum(maxItems int64) {
 func (a *arrayBuilder) Items(cb func(SchemaBuilder)) {
 	itemSchema := &Schema{}
 	cb(NewSchemaBuilder(itemSchema))
+
+	bubbleDefs(a.schema, itemSchema)
 	a.schema.Items = itemSchema
+}
+
+func (a *arrayBuilder) Ref(id string) {
+	a.schema.Ref = id
 }
 
 func (a *arrayBuilder) Schema() *Schema {
 	return a.schema
+}
+
+func bubbleDefs(parent, child *Schema) {
+	if len(child.Defs) == 0 {
+		return
+	}
+
+	if parent.Defs == nil {
+		parent.Defs = make(map[string]*Schema)
+	}
+
+	for key, value := range child.Defs {
+		parent.Defs[key] = value
+		delete(child.Defs, key) // sketchy
+	}
 }

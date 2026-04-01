@@ -12,6 +12,7 @@ type (
 		String(func(StringBuilder))
 		Boolean()
 		Array(func(ArrayBuilder))
+		Ref(string)
 
 		Default(any)
 	}
@@ -20,6 +21,7 @@ type (
 		Builder
 		Id(string)
 		Property(name string, required bool, nullable bool, cb func(SchemaBuilder))
+		AdditionalProperties(any)
 	}
 
 	NumberBuilder interface {
@@ -42,6 +44,7 @@ type (
 		Builder
 		Minimum(int64)
 		Maximum(int64)
+		Ref(string)
 		Items(func(SchemaBuilder))
 	}
 )

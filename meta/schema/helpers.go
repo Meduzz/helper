@@ -6,6 +6,19 @@ import (
 )
 
 func SchemaFor(it any) *Schema {
+	// Start of "problem free area"™
+	// NOTHING can go wrong here, right? RIGHT?
+	_, isSchema := it.(*Schema)
+	if isSchema {
+		return meta
+	}
+
+	_, isSchema = it.(Schema)
+	if isSchema {
+		return meta
+	}
+	// End of "problem free area"™.
+
 	s := &Schema{}
 
 	v := reflect.TypeOf(it)
@@ -43,11 +56,42 @@ func schemaFor(v reflect.Type, schema *Schema) {
 	case reflect.Float32, reflect.Float64:
 		builder := NewSchemaBuilder(schema)
 		builder.Number(func(nb NumberBuilder) {})
+	case reflect.Map:
+		if v.Key().Kind() != reflect.String {
+			// key is not string, then dont process.
+			return
+		}
+
+		builder := NewObjectBuilder(schema)
+
+		if v.Elem().Kind() == reflect.Interface {
+			// if map type is any, then wildcard it.
+			builder.AdditionalProperties(true)
+			return
+		}
+
+		// otherwise process it and see what comes out on the other side.
+		propsSchema := &Schema{}
+		schemaFor(v.Elem(), propsSchema)
+		bubbleDefs(builder.Schema(), propsSchema)
+		builder.AdditionalProperties(propsSchema)
 	}
 	// TODO maps? but unles key is string...?
 }
 
 func schemaForStruct(v reflect.Type, schema *Schema) {
+	if v.PkgPath() == "github.com/Meduzz/helper/meta/schema" && v.Name() == "Schema" {
+		schema.Type = append(schema.Type, Object)
+		if schema.Defs == nil {
+			schema.Defs = make(map[string]*Schema)
+		}
+
+		// TODO should be on parent
+		schema.Defs["schema"] = meta
+		schema.Ref = "#/$defs/schema"
+		return
+	}
+
 	builder := NewObjectBuilder(schema)
 	builder.Id(v.Name())
 
@@ -108,4 +152,13 @@ func schemaForArray(v reflect.Type, schema *Schema) {
 	builder.Items(func(sb SchemaBuilder) {
 		schemaFor(v.Elem(), sb.Schema())
 	})
+}
+
+func WithBuider(cb func(SchemaBuilder)) *Schema {
+	schema := &Schema{}
+	builder := NewSchemaBuilder(schema)
+
+	cb(builder)
+
+	return schema
 }
