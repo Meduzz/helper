@@ -24,7 +24,7 @@ func StructFunc(msg string) (*message, error) {
 	if msg != "error" {
 		return &message{msg}, nil
 	} else {
-		return nil, fmt.Errorf(msg)
+		return nil, fmt.Errorf("%s", msg)
 	}
 }
 
@@ -307,6 +307,98 @@ func Test_Batch(t *testing.T) {
 
 		if err.Error() != "error" {
 			t.Errorf("error was not 'error' but '%s'", err.Error())
+		}
+	})
+}
+
+func Test_FlatBatch(t *testing.T) {
+	t.Run("happy case", func(t *testing.T) {
+		input := []int{1, 2, 3}
+
+		op := func(i int) ([]int, error) {
+			return []int{i, i * 10}, nil
+		}
+
+		subject := FlatBatch(input, op)
+
+		if subject.IsFailure() {
+			t.Error("subject was a failure")
+		}
+
+		items, _ := subject.Get()
+
+		expected := []int{1, 10, 2, 20, 3, 30}
+		if len(items) != len(expected) {
+			t.Fatalf("items length was not %d but %d", len(expected), len(items))
+		}
+
+		for i := range expected {
+			if items[i] != expected[i] {
+				t.Errorf("item at index %d was not %d but %d", i, expected[i], items[i])
+			}
+		}
+	})
+
+	t.Run("empty input", func(t *testing.T) {
+		input := []int{}
+
+		op := func(i int) ([]int, error) {
+			return []int{i}, nil
+		}
+
+		subject := FlatBatch(input, op)
+
+		if subject.IsFailure() {
+			t.Error("subject was a failure")
+		}
+
+		items, _ := subject.Get()
+
+		if len(items) != 0 {
+			t.Errorf("items length was not 0 but %d", len(items))
+		}
+	})
+
+	t.Run("op returns empty slices", func(t *testing.T) {
+		input := []int{1, 2, 3}
+
+		op := func(i int) ([]int, error) {
+			return []int{}, nil
+		}
+
+		subject := FlatBatch(input, op)
+
+		if subject.IsFailure() {
+			t.Error("subject was a failure")
+		}
+
+		items, _ := subject.Get()
+
+		if len(items) != 0 {
+			t.Errorf("items length was not 0 but %d", len(items))
+		}
+	})
+
+	t.Run("op returns error", func(t *testing.T) {
+		input := []int{1, 2, 3}
+
+		op := func(i int) ([]int, error) {
+			if i == 2 {
+				return nil, errBoom
+			}
+			return []int{i}, nil
+		}
+
+		subject := FlatBatch(input, op)
+
+		if subject.IsSuccess() {
+			t.Error("subject was a success")
+		}
+
+		_, err := subject.Get()
+
+		if !errors.Is(err, errBoom) {
+			t.Errorf("error was not boom but: %v", err)
 		}
 	})
 }

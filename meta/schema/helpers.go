@@ -76,7 +76,6 @@ func schemaFor(v reflect.Type, schema *Schema) {
 		bubbleDefs(builder.Schema(), propsSchema)
 		builder.AdditionalProperties(propsSchema)
 	}
-	// TODO maps? but unles key is string...?
 }
 
 func schemaForStruct(v reflect.Type, schema *Schema) {

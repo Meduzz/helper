@@ -109,6 +109,18 @@ func Batch[T any, K any](data []T, op func(T) (K, error)) *Operation[[]K] {
 	})
 }
 
+// FlatBatch executes provided op on provided data slice and returns a single Operation containing the flattened result as an array or the first error.
+func FlatBatch[T any, K any](data []T, op func(T) ([]K, error)) *Operation[[]K] {
+	return slice.Fold(data, Success(make([]K, 0)), func(item T, agg *Operation[[]K]) *Operation[[]K] {
+		return FlatMap(agg, func(items []K) *Operation[[]K] {
+			result := Execute(op(item))
+			return Map(result, func(it []K) []K {
+				return append(items, it...)
+			})
+		})
+	})
+}
+
 // Get return what ever is in o.
 func (o *Operation[T]) Get() (T, error) {
 	return o.data, o.err
