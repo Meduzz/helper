@@ -11,6 +11,18 @@ type (
 
 // And - combine 2 predicates into one with &&
 func And[T any](first, second Predicate[T]) Predicate[T] {
+	if first == nil {
+		if second == nil {
+			return nil // should survive more predicates getting merged?
+		} else {
+			return second
+		}
+	} else {
+		if second == nil {
+			return first
+		}
+	}
+
 	return func(t T) bool {
 		return first(t) && second(t)
 	}
@@ -18,6 +30,18 @@ func And[T any](first, second Predicate[T]) Predicate[T] {
 
 // Or - combine 2 predicates into one with ||
 func Or[T any](first, second Predicate[T]) Predicate[T] {
+	if first == nil {
+		if second == nil {
+			return nil // should survive more predicates getting merged?
+		} else {
+			return second
+		}
+	} else {
+		if second == nil {
+			return first
+		}
+	}
+
 	return func(t T) bool {
 		return first(t) || second(t)
 	}
