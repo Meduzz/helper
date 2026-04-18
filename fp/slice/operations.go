@@ -7,7 +7,7 @@ import (
 )
 
 // Map on a slice of T returning a slice of K
-func Map[T any, K any](in []T, handler func(T) K) []K {
+func Map[T any, K any](in []T, handler fp.Calculation[T, K]) []K {
 	out := make([]K, 0)
 
 	for _, i := range in {
@@ -18,7 +18,7 @@ func Map[T any, K any](in []T, handler func(T) K) []K {
 }
 
 // FlatMap on a slice of T to a slice of K
-func FlatMap[T any, K any](in []T, handler func(T) []K) []K {
+func FlatMap[T any, K any](in []T, handler fp.Calculation[T, []K]) []K {
 	out := make([]K, 0)
 
 	for _, i := range in {
@@ -29,7 +29,7 @@ func FlatMap[T any, K any](in []T, handler func(T) []K) []K {
 }
 
 // Fold over a slice of T merging into type of K
-func Fold[T any, K any](in []T, agg K, handler func(T, K) K) K {
+func Fold[T any, K any](in []T, agg K, handler fp.Aggregate[T, K]) K {
 	for _, i := range in {
 		agg = handler(i, agg)
 	}
@@ -128,7 +128,7 @@ func Partition[T any](in []T, size int) [][]T {
 }
 
 // Group a slice of T into a map[string][]T
-func Group[T any](in []T, grouper func(T) string) map[string][]T {
+func Group[T any](in []T, grouper fp.Calculation[T, string]) map[string][]T {
 	out := make(map[string][]T)
 
 	Fold(in, out, func(t T, m map[string][]T) map[string][]T {
@@ -149,7 +149,7 @@ func Group[T any](in []T, grouper func(T) string) map[string][]T {
 }
 
 // Shard a slice of T into a map[int64][]T
-func Shard[T any](in []T, sharder func(T) int64) map[int64][]T {
+func Shard[T any](in []T, sharder fp.Calculation[T, int64]) map[int64][]T {
 	out := make(map[int64][]T, 0)
 
 	Fold(in, out, func(t T, m map[int64][]T) map[int64][]T {

@@ -7,6 +7,7 @@ type (
 	Operation[T any, K any]   func(T) (K, error)
 	Action[T any]             func(T) error
 	Calculation[T any, K any] func(T) K
+	Aggregate[T any, K any]   func(T, K) K
 )
 
 // And - combine 2 predicates into one with &&

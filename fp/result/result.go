@@ -34,7 +34,7 @@ func Failure[T any](err error) *Operation[T] {
 
 // Then execute a function that accepts T and returns (Z, error).
 // Will return previous error if present in op.
-func Then[T any, Z any](op *Operation[T], fun func(it T) (Z, error)) *Operation[Z] {
+func Then[T any, Z any](op *Operation[T], fun fp.Operation[T, Z]) *Operation[Z] {
 	var zero Z
 
 	if op.err != nil {
@@ -46,7 +46,7 @@ func Then[T any, Z any](op *Operation[T], fun func(it T) (Z, error)) *Operation[
 
 // Map allows you to map on a successful operation to chang the value
 // of the "container", will do nothing if op is failed.
-func Map[T any, Z any](op *Operation[T], fun func(i T) Z) *Operation[Z] {
+func Map[T any, Z any](op *Operation[T], fun fp.Calculation[T, Z]) *Operation[Z] {
 	if op.err == nil {
 		return &Operation[Z]{fun(op.data), nil}
 	}
@@ -58,7 +58,7 @@ func Map[T any, Z any](op *Operation[T], fun func(i T) Z) *Operation[Z] {
 
 // FlatMap lets you execute a function that already returns a result, with the value of
 // of an result. If op is failed, then nothing happens.
-func FlatMap[T any, Z any](op *Operation[T], fun func(T) *Operation[Z]) *Operation[Z] {
+func FlatMap[T any, Z any](op *Operation[T], fun fp.Calculation[T, *Operation[Z]]) *Operation[Z] {
 	if op.err != nil {
 		var z Z
 		return &Operation[Z]{z, op.err}
@@ -69,7 +69,7 @@ func FlatMap[T any, Z any](op *Operation[T], fun func(T) *Operation[Z]) *Operati
 
 // Recover from an error, by turning it into a T.
 // This function is safe to execute even if there's no errors.
-func Recover[T any](o *Operation[T], fun func(error) T) *Operation[T] {
+func Recover[T any](o *Operation[T], fun fp.Calculation[error, T]) *Operation[T] {
 	if o.err == nil {
 		return o
 	}
@@ -87,7 +87,7 @@ func GetOrElse[T any](o *Operation[T], fun fp.Producer[T]) T {
 }
 
 // Transform transform an error to another error
-func Transform[T any](o *Operation[T], op func(error) error) *Operation[T] {
+func Transform[T any](o *Operation[T], op fp.Calculation[error, error]) *Operation[T] {
 	if o.err == nil {
 		return o
 	}
@@ -98,7 +98,7 @@ func Transform[T any](o *Operation[T], op func(error) error) *Operation[T] {
 }
 
 // Batch executes provided op on provided data slice and returns a single Operation containing the result as an array or the first error.
-func Batch[T any, K any](data []T, op func(T) (K, error)) *Operation[[]K] {
+func Batch[T any, K any](data []T, op fp.Operation[T, K]) *Operation[[]K] {
 	return slice.Fold(data, Success(make([]K, 0)), func(item T, agg *Operation[[]K]) *Operation[[]K] {
 		return FlatMap(agg, func(items []K) *Operation[[]K] {
 			result := Execute(op(item))
@@ -110,7 +110,7 @@ func Batch[T any, K any](data []T, op func(T) (K, error)) *Operation[[]K] {
 }
 
 // FlatBatch executes provided op on provided data slice and returns a single Operation containing the flattened result as an array or the first error.
-func FlatBatch[T any, K any](data []T, op func(T) ([]K, error)) *Operation[[]K] {
+func FlatBatch[T any, K any](data []T, op fp.Operation[T, []K]) *Operation[[]K] {
 	return slice.Fold(data, Success(make([]K, 0)), func(item T, agg *Operation[[]K]) *Operation[[]K] {
 		return FlatMap(agg, func(items []K) *Operation[[]K] {
 			result := Execute(op(item))
