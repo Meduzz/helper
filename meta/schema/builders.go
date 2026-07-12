@@ -1,9 +1,5 @@
 package schema
 
-import (
-	"github.com/Meduzz/helper/fp/slice"
-)
-
 type (
 	schemaBuilder struct {
 		schema *Schema
@@ -38,7 +34,7 @@ func (s *schemaBuilder) Number(cb func(NumberBuilder)) {
 	if cb != nil {
 		cb(NewNumberBuilder(s.schema))
 	} else {
-		s.schema.Type = append(s.schema.Type, Number)
+		s.schema.Type = Merge(s.schema.Type, Number)
 	}
 }
 
@@ -46,12 +42,12 @@ func (s *schemaBuilder) String(cb func(StringBuilder)) {
 	if cb != nil {
 		cb(NewStringBuilder(s.schema))
 	} else {
-		s.schema.Type = append(s.schema.Type, String)
+		s.schema.Type = Merge(s.schema.Type, String)
 	}
 }
 
 func (s *schemaBuilder) Boolean() {
-	s.schema.Type = append(s.schema.Type, Boolean)
+	s.schema.Type = Merge(s.schema.Type, Boolean)
 }
 
 func (s *schemaBuilder) Array(cb func(ArrayBuilder)) {
@@ -75,7 +71,7 @@ func NewObjectBuilder(schema *Schema) ObjectBuilder {
 		schema.Properties = make(map[string]*Schema)
 	}
 
-	schema.Type = append(schema.Type, Object)
+	schema.Type = Merge(schema.Type, Object)
 
 	return &objectBuilder{schema}
 }
@@ -84,7 +80,7 @@ func (o *objectBuilder) Property(property string, required, nullable bool, cb fu
 	propertySchema := &Schema{}
 
 	if nullable {
-		propertySchema.Type = append(propertySchema.Type, Null)
+		propertySchema.Type = Merge(propertySchema.Type, Null)
 	}
 
 	if required {
@@ -110,17 +106,15 @@ func (o *objectBuilder) Schema() *Schema {
 }
 
 func NewNumberBuilder(schema *Schema) NumberBuilder {
-	schema.Type = append(schema.Type, Number)
+	schema.Type = Merge(schema.Type, Number)
 
 	return &numberBuilder{schema}
 }
 
 func (n *numberBuilder) Integer() {
 	// a little bit dirty
-	n.schema.Type = slice.Filter(n.schema.Type, func(k Kind) bool {
-		return k != Number
-	})
-	n.schema.Type = append(n.schema.Type, Integer)
+	n.schema.Type = Drop(n.schema.Type, Number)
+	n.schema.Type = Merge(n.schema.Type, Integer)
 }
 
 func (n *numberBuilder) Minimum(min int64) {
@@ -140,7 +134,7 @@ func (n *numberBuilder) Schema() *Schema {
 }
 
 func NewStringBuilder(schema *Schema) StringBuilder {
-	schema.Type = append(schema.Type, String)
+	schema.Type = Merge(schema.Type, String)
 
 	return &stringBuilder{schema}
 }
@@ -166,7 +160,7 @@ func (s *stringBuilder) Schema() *Schema {
 }
 
 func NewArrayBuilder(schema *Schema) ArrayBuilder {
-	schema.Type = append(schema.Type, Array)
+	schema.Type = Merge(schema.Type, Array)
 
 	return &arrayBuilder{schema}
 }

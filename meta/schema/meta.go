@@ -40,7 +40,7 @@ var meta = WithBuider(func(sb SchemaBuilder) {
 			})
 		})
 		ob.Property("default", false, true, func(sb SchemaBuilder) {
-			sb.Schema().Type = append(sb.Schema().Type, Object, Array, Number, Integer, Boolean, String)
+			sb.Schema().Type = Merge(sb.Schema().Type, Object, Array, Number, Integer, Boolean, String)
 		})
 		ob.Property("minimum", false, true, func(sb SchemaBuilder) {
 			sb.Number(func(nb NumberBuilder) {

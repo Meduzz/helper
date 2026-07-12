@@ -80,7 +80,7 @@ func schemaFor(v reflect.Type, schema *Schema) {
 
 func schemaForStruct(v reflect.Type, schema *Schema) {
 	if v.PkgPath() == "github.com/Meduzz/helper/meta/schema" && v.Name() == "Schema" {
-		schema.Type = append(schema.Type, Object)
+		schema.Type = Merge(schema.Type, Object)
 		if schema.Defs == nil {
 			schema.Defs = make(map[string]*Schema)
 		}
@@ -138,7 +138,7 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 					hook, ok := vValue.(SchemaHook)
 
 					if ok {
-						hook.Enchance(name, sb.Schema())
+						hook.Enhance(name, sb.Schema())
 					}
 				}
 			})

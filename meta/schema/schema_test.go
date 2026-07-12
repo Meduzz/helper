@@ -38,31 +38,31 @@ func TestSchema(t *testing.T) {
 
 		builder.Array(func(ab schema.ArrayBuilder) {})
 
-		if !contains(subject.Type, schema.Array) {
+		if !subject.Type.Contains(schema.Array) {
 			t.Error("type did not contain array")
 		}
 
 		builder.Boolean()
 
-		if !contains(subject.Type, schema.Boolean) {
+		if !subject.Type.Contains(schema.Boolean) {
 			t.Error("type did not contain boolean")
 		}
 
 		builder.String(func(sb schema.StringBuilder) {})
 
-		if !contains(subject.Type, schema.String) {
+		if !subject.Type.Contains(schema.String) {
 			t.Error("type did not contain string")
 		}
 
 		builder.Number(func(nb schema.NumberBuilder) {})
 
-		if !contains(subject.Type, schema.Number) {
+		if !subject.Type.Contains(schema.Number) {
 			t.Error("type did not contain number")
 		}
 
 		builder.Object(func(ob schema.ObjectBuilder) {})
 
-		if !contains(subject.Type, schema.Object) {
+		if !subject.Type.Contains(schema.Object) {
 			t.Error("type did not contain object")
 		}
 	})
@@ -95,7 +95,7 @@ func TestSchema(t *testing.T) {
 			t.Error("name waas not set")
 		}
 
-		if contains(nameSchema.Type, schema.Null) {
+		if nameSchema.Type.Contains(schema.Null) {
 			t.Error("name was marked as nullable")
 		}
 
@@ -103,7 +103,7 @@ func TestSchema(t *testing.T) {
 			t.Error("age was not set")
 		}
 
-		if !contains(ageSchema.Type, schema.Null) {
+		if !ageSchema.Type.Contains(schema.Null) {
 			t.Error("age was not marked as nullable")
 		}
 	})
@@ -130,7 +130,7 @@ func TestSchema(t *testing.T) {
 			t.Error("items was not set")
 		}
 
-		if !contains(subject.Items.Type, schema.String) {
+		if !subject.Items.Type.Contains(schema.String) {
 			t.Error("items.Type was not string")
 		}
 	})
@@ -144,7 +144,7 @@ func TestSchema(t *testing.T) {
 		builder.MultipleOf(2)
 		builder.Integer()
 
-		if !contains(subject.Type, schema.Integer) {
+		if !subject.Type.Contains(schema.Integer) {
 			t.Error("type did not contain integeger")
 		}
 
@@ -195,7 +195,7 @@ func TestSchema(t *testing.T) {
 				t.Error("schema id was not Person")
 			}
 
-			if !contains(subject.Type, schema.Object) {
+			if !subject.Type.Contains(schema.Object) {
 				t.Error("schema was not marked as object")
 			}
 
@@ -214,7 +214,7 @@ func TestSchema(t *testing.T) {
 				t.Error("name waas not set")
 			}
 
-			if contains(nameSchema.Type, schema.Null) {
+			if nameSchema.Type.Contains(schema.Null) {
 				t.Error("name was marked as nullable")
 			}
 
@@ -222,7 +222,7 @@ func TestSchema(t *testing.T) {
 				t.Error("age was not set")
 			}
 
-			if !contains(ageSchema.Type, schema.Null) {
+			if !ageSchema.Type.Contains(schema.Null) {
 				t.Error("age was not marked as nullable")
 			}
 
@@ -238,7 +238,7 @@ func TestSchema(t *testing.T) {
 		t.Run("Ints", func(t *testing.T) {
 			subject := schema.SchemaFor(99)
 
-			if !contains(subject.Type, schema.Integer) {
+			if !subject.Type.Contains(schema.Integer) {
 				t.Error("type was not integer")
 			}
 		})
@@ -246,7 +246,7 @@ func TestSchema(t *testing.T) {
 		t.Run("Decimals", func(t *testing.T) {
 			subject := schema.SchemaFor(0.99)
 
-			if !contains(subject.Type, schema.Number) {
+			if !subject.Type.Contains(schema.Number) {
 				t.Error("type was not number")
 			}
 		})
@@ -254,7 +254,7 @@ func TestSchema(t *testing.T) {
 		t.Run("Boolean", func(t *testing.T) {
 			subject := schema.SchemaFor(false)
 
-			if !contains(subject.Type, schema.Boolean) {
+			if !subject.Type.Contains(schema.Boolean) {
 				t.Error("type was not boolean")
 			}
 		})
@@ -262,7 +262,7 @@ func TestSchema(t *testing.T) {
 		t.Run("Strings", func(t *testing.T) {
 			subject := schema.SchemaFor("asdf")
 
-			if !contains(subject.Type, schema.String) {
+			if !subject.Type.Contains(schema.String) {
 				t.Error("type was not string")
 			}
 		})
@@ -270,7 +270,7 @@ func TestSchema(t *testing.T) {
 		t.Run("Arrays", func(t *testing.T) {
 			subject := schema.SchemaFor(make([]int, 0))
 
-			if !contains(subject.Type, schema.Array) {
+			if !subject.Type.Contains(schema.Array) {
 				t.Error("type was not array")
 			}
 
@@ -278,7 +278,7 @@ func TestSchema(t *testing.T) {
 				t.Error("items was not set")
 			}
 
-			if !contains(subject.Items.Type, schema.Integer) {
+			if !subject.Items.Type.Contains(schema.Integer) {
 				t.Error("items.type was not integer")
 			}
 		})
@@ -294,6 +294,8 @@ func TestSchema(t *testing.T) {
 				t.Errorf("marshaling threw error: %v", err)
 			}
 
+			println(string(jsonData))
+
 			subject = &schema.Schema{}
 			err = json.Unmarshal(jsonData, subject)
 
@@ -301,7 +303,7 @@ func TestSchema(t *testing.T) {
 				t.Error("schema id was not Person")
 			}
 
-			if !contains(subject.Type, schema.Object) {
+			if !subject.Type.Contains(schema.Object) {
 				t.Error("schema was not marked as object")
 			}
 
@@ -320,7 +322,7 @@ func TestSchema(t *testing.T) {
 				t.Error("name waas not set")
 			}
 
-			if contains(nameSchema.Type, schema.Null) {
+			if nameSchema.Type.Contains(schema.Null) {
 				t.Error("name was marked as nullable")
 			}
 
@@ -328,7 +330,7 @@ func TestSchema(t *testing.T) {
 				t.Error("age was not set")
 			}
 
-			if !contains(ageSchema.Type, schema.Null) {
+			if !ageSchema.Type.Contains(schema.Null) {
 				t.Error("age was not marked as nullable")
 			}
 
@@ -367,7 +369,7 @@ func TestSchema(t *testing.T) {
 			t.Fatal("value did not exist")
 		}
 
-		if !contains(props.Type, schema.Object) {
+		if !props.Type.Contains(schema.Object) {
 			t.Fatal("type was not object")
 		}
 
@@ -399,11 +401,70 @@ func TestSchema(t *testing.T) {
 	})
 }
 
+func TestKind(t *testing.T) {
+	t.Run("Kind (of) tests", func(t *testing.T) {
+		t.Run("To from Array", func(t *testing.T) {
+			subject := schema.Join(schema.String, schema.Number)
+
+			bs, err := json.Marshal(subject)
+
+			if err != nil {
+				t.Errorf("Marshal Kind threw error: %v", err)
+			}
+
+			var result schema.Kind
+			err = json.Unmarshal(bs, &result)
+
+			if err != nil {
+				t.Errorf("Unmarshal Kind threw error: %v", err)
+			}
+
+			if !result.Contains(schema.String) {
+				t.Error("result did not contain String")
+			}
+
+			if !result.Contains(schema.Number) {
+				t.Errorf("result did not contain Number")
+			}
+		})
+
+		t.Run("To from Single", func(t *testing.T) {
+			subject := schema.Object
+
+			bs, err := json.Marshal(subject)
+			if err != nil {
+				t.Errorf("Marshal Kind threw error: %v", err)
+			}
+
+			var result schema.Kind
+			err = json.Unmarshal(bs, &result)
+
+			if err != nil {
+				t.Errorf("Unmarshal Kind threw error: %v", err)
+			}
+
+			if !result.Contains(schema.Object) {
+				t.Error("result did not contain Object")
+			}
+		})
+
+		t.Run("Drop stuff", func(t *testing.T) {
+			subject := schema.Join(schema.String, schema.Number)
+
+			result := schema.Drop(subject, schema.Number)
+
+			if result.Contains(schema.Number) {
+				t.Error("result contained number")
+			}
+		})
+	})
+}
+
 func contains[T any](schema []T, kind T) bool {
 	return slice.Contains(schema, kind)
 }
 
-func (Person) Enchance(field string, schemah *schema.Schema) {
+func (Person) Enhance(field string, schemah *schema.Schema) {
 	if field == "Age" {
 		builder := schema.NewNumberBuilder(schemah)
 		builder.Minimum(18)
