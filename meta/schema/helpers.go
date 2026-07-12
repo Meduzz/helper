@@ -96,7 +96,7 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 
 	fieldCount := v.NumField()
 
-	for i := 0; i < fieldCount; i++ {
+	for i := range fieldCount {
 		rf := v.Field(i)
 
 		if rf.IsExported() {
@@ -107,16 +107,16 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 			jsonTag, ok := rf.Tag.Lookup("json")
 
 			if ok {
-				jsonTag = strings.Replace(jsonTag, "string", "", -1)
+				jsonTag = strings.ReplaceAll(jsonTag, "string", "")
 
 				// ignore json ignored fields
 				if jsonTag == "-" {
 					continue
 				}
 
-				tagContent := strings.Split(jsonTag, ",")
+				tagContent := strings.SplitSeq(jsonTag, ",")
 
-				for _, it := range tagContent {
+				for it := range tagContent {
 					if it != "" && it != "-" {
 						if it == "omitempty" {
 							nullable = true
@@ -133,7 +133,7 @@ func schemaForStruct(v reflect.Type, schema *Schema) {
 				schemaFor(rf.Type, sb.Schema())
 
 				// give structs that implements SchemaHook, speciul treatment.
-				if v.AssignableTo(reflect.TypeOf((*SchemaHook)(nil)).Elem()) {
+				if v.AssignableTo(reflect.TypeFor[SchemaHook]()) {
 					vValue := reflect.New(v).Interface()
 					hook, ok := vValue.(SchemaHook)
 

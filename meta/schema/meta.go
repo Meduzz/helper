@@ -3,7 +3,7 @@ package schema
 var meta = WithBuider(func(sb SchemaBuilder) {
 	sb.Object(func(ob ObjectBuilder) {
 		ob.Id("Schema")
-		ob.Property("kind", true, false, func(sb SchemaBuilder) {
+		ob.Property("type", true, false, func(sb SchemaBuilder) {
 			sb.Array(func(ab ArrayBuilder) {
 				ab.Items(func(sb SchemaBuilder) {
 					sb.String(func(sb StringBuilder) {})

@@ -4,7 +4,7 @@ type (
 	Kind string
 
 	Schema struct {
-		Type                 []Kind             `json:"kind"`
+		Type                 []Kind             `json:"type"`
 		Properties           map[string]*Schema `json:"properties,omitempty"`
 		AdditionalProperties any                `json:"additionalProperties,omitempty"` // bool or *Schema
 		Pattern              string             `json:"pattern,omitempty"`
