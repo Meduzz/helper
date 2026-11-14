@@ -7,7 +7,7 @@ import (
 
 type (
 	WithGin interface {
-		Setup(*gin.Engine)
+		WithGin(*gin.Engine)
 	}
 
 	ginDelegate struct {
@@ -25,7 +25,7 @@ func NewGinDelegate(srv *gin.Engine) service.Delegate {
 
 func (d *ginDelegate) Visit(svc service.Service) error {
 	if api, ok := svc.(WithGin); ok {
-		api.Setup(d.srv)
+		api.WithGin(d.srv)
 	}
 	return nil
 }

@@ -7,7 +7,7 @@ import (
 
 type (
 	WithRPC interface {
-		Setup(*rpc.RPC)
+		WithRPC(*rpc.RPC)
 	}
 
 	rpcDelegate struct {
@@ -25,7 +25,7 @@ func NewRpcDelegate(router *rpc.RPC) service.Delegate {
 
 func (d *rpcDelegate) Visit(svc service.Service) error {
 	if api, ok := svc.(WithRPC); ok {
-		api.Setup(d.router)
+		api.WithRPC(d.router)
 	}
 	return nil
 }

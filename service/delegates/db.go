@@ -9,7 +9,7 @@ import (
 type (
 	// WithDB defines the interface for services that need a GORM database connection.
 	WithDB interface {
-		Setup(db *gorm.DB)
+		WithDB(db *gorm.DB)
 	}
 
 	dbDelegate struct {
@@ -29,7 +29,7 @@ func NewDbDelegate(db *gorm.DB) service.Delegate {
 // Visit visits a service and injects the GORM database if the service implements DbConnection.
 func (d *dbDelegate) Visit(svc service.Service) error {
 	if svcWithDb, ok := svc.(WithDB); ok {
-		svcWithDb.Setup(d.db)
+		svcWithDb.WithDB(d.db)
 	}
 	return nil
 }
