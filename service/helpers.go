@@ -7,19 +7,14 @@ import (
 )
 
 var (
-	services  = make([]Service, 0)
-	delegates = make([]Delegate, 0)
+	services = make([]Service, 0)
 )
 
 func AddService(svc Service) {
 	services = append(services, svc)
 }
 
-func AddDelegate(del Delegate) {
-	delegates = append(delegates, del)
-}
-
-func Start() error {
+func Start(delegates ...Delegate) error {
 	return slice.Fold(services, nil, func(svc Service, agg error) error {
 		if agg != nil {
 			return agg
