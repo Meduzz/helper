@@ -20,19 +20,19 @@ func Start(delegates ...Delegate) error {
 			return agg
 		}
 
-		err := svc.Start()
-
-		if err != nil {
-			return err
-		}
-
-		return slice.Fold(delegates, nil, func(d Delegate, agg2 error) error {
+		err := slice.Fold(delegates, nil, func(d Delegate, agg2 error) error {
 			if agg2 != nil {
 				return agg2
 			}
 
 			return d.Visit(svc)
 		})
+
+		if err != nil {
+			return err
+		}
+
+		return svc.Start()
 	})
 }
 

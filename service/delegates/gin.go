@@ -10,20 +10,20 @@ type (
 		Setup(*gin.Engine)
 	}
 
-	webApiDelegate struct {
+	ginDelegate struct {
 		srv *gin.Engine
 	}
 )
 
-var _ service.Delegate = (*webApiDelegate)(nil)
+var _ service.Delegate = (*ginDelegate)(nil)
 
-func NewWebApiDelegate(srv *gin.Engine) service.Delegate {
-	return &webApiDelegate{
+func NewGinDelegate(srv *gin.Engine) service.Delegate {
+	return &ginDelegate{
 		srv: srv,
 	}
 }
 
-func (d *webApiDelegate) Visit(svc service.Service) error {
+func (d *ginDelegate) Visit(svc service.Service) error {
 	if api, ok := svc.(WithGin); ok {
 		api.Setup(d.srv)
 	}
